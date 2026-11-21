@@ -1,0 +1,3085 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ลอยกระทงออนไลน์ ณ วิทยาลัยเทคนิคท่าหลวงซิเมนต์ไทยอนุสรณ์</title>
+  
+  <!-- Google Fonts: Kanit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            kanit: ['Kanit', 'sans-serif'],
+          },
+          colors: {
+            loy: {
+              gold: '#F59E0B',
+              amber: '#D97706',
+              night: '#0B132B',
+              deep: '#1C2541',
+              water: '#0A2540',
+              lotus: '#EC4899',
+              teal: '#14B8A6'
+            }
+          },
+          animation: {
+            'float-slow': 'float 4s ease-in-out infinite',
+            'float-river': 'drift 18s linear infinite',
+            'pulse-glow': 'pulseGlow 2s infinite',
+            'sway': 'sway 2s ease-in-out infinite alternate',
+            'shake-bamboo': 'shakeBamboo 0.5s ease-in-out infinite',
+            'sparkle': 'sparkle 1.5s ease-in-out infinite alternate',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+              '50%': { transform: 'translateY(-8px) rotate(1deg)' },
+            },
+            drift: {
+              '0%': { transform: 'translateX(100vw) translateY(0px) scale(0.9)' },
+              '50%': { transform: 'translateX(50vw) translateY(10px) scale(1.0)' },
+              '100%': { transform: 'translateX(-120px) translateY(-5px) scale(0.95)' },
+            },
+            pulseGlow: {
+              '0%, 100%': { filter: 'drop-shadow(0 0 10px rgba(245, 158, 11, 0.7))' },
+              '50%': { filter: 'drop-shadow(0 0 25px rgba(245, 158, 11, 1))' },
+            },
+            sway: {
+              '0%': { transform: 'rotate(-4deg) translateY(0px)' },
+              '100%': { transform: 'rotate(4deg) translateY(-6px)' }
+            },
+            shakeBamboo: {
+              '0%': { transform: 'rotate(0deg) translate(0, 0)' },
+              '20%': { transform: 'rotate(-12deg) translate(-4px, -6px)' },
+              '40%': { transform: 'rotate(10deg) translate(5px, 3px)' },
+              '60%': { transform: 'rotate(-8deg) translate(-3px, 4px)' },
+              '80%': { transform: 'rotate(8deg) translate(4px, -3px)' },
+              '100%': { transform: 'rotate(0deg) translate(0, 0)' }
+            },
+            sparkle: {
+              '0%': { opacity: '0.4', transform: 'scale(0.8)' },
+              '100%': { opacity: '1', transform: 'scale(1.2)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * {
+      font-family: 'Kanit', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    input, textarea, select {
+      user-select: text;
+    }
+    /* Hide scrollbars but allow scrolling */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    
+    /* Neon & Water Glow Effects */
+    .glow-gold {
+      text-shadow: 0 0 12px rgba(245, 158, 11, 0.7), 0 0 25px rgba(217, 119, 6, 0.4);
+    }
+    .glow-cyan {
+      text-shadow: 0 0 12px rgba(6, 182, 212, 0.7);
+    }
+    .box-glow {
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45), 0 0 20px 2px rgba(245, 158, 11, 0.2);
+    }
+
+    /* Swipeable viewport & slider */
+    #swipeContainer {
+      display: flex;
+      width: 300%;
+      height: 100%;
+      transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+      will-change: transform;
+    }
+    .page-section {
+      width: 100vw;
+      height: 100%;
+      flex-shrink: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Water wave animation with bright luminous reflections */
+    .water-wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200%;
+      height: 110px;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.45) 0%, rgba(14, 165, 233, 0.3) 30%, rgba(3, 105, 161, 0.85) 70%, rgba(12, 74, 110, 0.98) 100%);
+      animation: waveMove 9s linear infinite;
+      box-shadow: 0 -10px 30px rgba(56, 189, 248, 0.35);
+    }
+    @keyframes waveMove {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Temple fair festive light bulbs */
+    .fair-bulb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: inline-block;
+      margin: 0 6px;
+      box-shadow: 0 0 12px currentColor;
+      animation: bulbBlink 1.4s ease-in-out infinite alternate;
+    }
+    @keyframes bulbBlink {
+      0% { opacity: 0.4; transform: scale(0.85); }
+      100% { opacity: 1; transform: scale(1.15); }
+    }
+
+    /* Canvas background on Page 1 */
+    #riverCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Toast Notification */
+    #toastNotification {
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    /* River & Sky Floating Keyframes */
+    @keyframes driftRiver {
+      0% { transform: translateX(105vw) translateY(0px) rotate(0deg); }
+      25% { transform: translateX(75vw) translateY(6px) rotate(1.5deg); }
+      50% { transform: translateX(45vw) translateY(-4px) rotate(-1.5deg); }
+      75% { transform: translateX(18vw) translateY(6px) rotate(1deg); }
+      100% { transform: translateX(-180px) translateY(0px) rotate(0deg); }
+    }
+
+    @keyframes driftSkyLantern {
+      0% { transform: translateX(105vw) translateY(10px) scale(0.9); opacity: 0.95; }
+      50% { transform: translateX(50vw) translateY(-15px) scale(1.0); opacity: 0.85; }
+      100% { transform: translateX(-180px) translateY(-30px) scale(0.75); opacity: 0.55; }
+    }
+
+    @keyframes newKrathongSpawn {
+      0% { transform: translateX(50vw) translateY(45px) scale(0.5); opacity: 0; filter: drop-shadow(0 0 35px #f59e0b); }
+      12% { transform: translateX(50vw) translateY(0px) scale(1.2); opacity: 1; filter: drop-shadow(0 0 25px #f59e0b); }
+      25% { transform: translateX(48vw) translateY(6px) scale(1.0); opacity: 1; filter: drop-shadow(0 0 15px #f59e0b); }
+      100% { transform: translateX(-180px) translateY(0px) scale(0.95); opacity: 1; }
+    }
+
+    @keyframes newLanternSpawn {
+      0% { transform: translateX(50vw) translateY(120px) scale(0.6); opacity: 0; filter: drop-shadow(0 0 40px #ec4899); }
+      15% { transform: translateX(50vw) translateY(0px) scale(1.2); opacity: 1; filter: drop-shadow(0 0 25px #ec4899); }
+      100% { transform: translateX(-180px) translateY(-60px) scale(0.75); opacity: 0.55; }
+    }
+
+    /* Water Ripple Effect for new Krathong */
+    .ripple-ring {
+      position: absolute;
+      width: 70px;
+      height: 25px;
+      border-radius: 50%;
+      border: 2px solid rgba(245, 158, 11, 0.8);
+      animation: rippleExpand 2.5s ease-out infinite;
+      pointer-events: none;
+    }
+    @keyframes rippleExpand {
+      0% { transform: scale(0.5); opacity: 1; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-b from-[#1E1B4B] via-[#0F172A] to-[#1E1B4B] text-slate-100 h-screen w-screen overflow-hidden flex flex-col justify-between relative selection:bg-amber-500 selection:text-white">
+
+  <!-- ========================================== -->
+  <!-- TOP HEADER / NAV BAR & AUDIO CONTROLS       -->
+  <!-- ========================================== -->
+  <header class="w-full bg-[#1E1B4B]/85 backdrop-blur-md border-b border-amber-400/30 z-50 px-3 py-2 flex items-center justify-between shadow-lg shadow-indigo-950/40 flex-shrink-0">
+    <!-- Brand / Title -->
+    <div class="flex items-center space-x-2">
+      <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-amber-500 via-pink-500 to-indigo-600 p-[2px] shadow-md shadow-amber-500/20">
+        <div class="w-full h-full bg-[#0B132B] rounded-full flex items-center justify-center text-amber-400 font-bold text-lg">
+          🪷
+        </div>
+      </div>
+      <div>
+        <h1 id="headerTitle" class="text-xs sm:text-sm font-semibold text-amber-300 tracking-wide line-clamp-1 glow-gold">
+          ลอยกระทงออนไลน์ ๒๕๖๗
+        </h1>
+        <p id="headerSubtitle" class="text-[10px] sm:text-xs text-slate-300 line-clamp-1">
+          วิทยาลัยเทคนิคท่าหลวงซิเมนต์ไทยอนุสรณ์
+        </p>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs (Desktop & Tablet) -->
+    <nav class="hidden md:flex items-center bg-slate-900/80 rounded-full p-1 border border-slate-700/60 shadow-inner">
+      <button onclick="switchPage(0)" id="tab-btn-0" class="px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 flex items-center space-x-1.5 bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/30">
+        <i class="fa-solid fa-water"></i>
+        <span>ท่าน้ำลอยกระทง</span>
+      </button>
+      <button onclick="switchPage(1)" id="tab-btn-1" class="px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 flex items-center space-x-1.5 text-slate-300 hover:text-amber-300">
+        <i class="fa-solid fa-scroll"></i>
+        <span>เซียมซีวัดท่าหลวง</span>
+      </button>
+      <button onclick="switchPage(2)" id="tab-btn-2" class="px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 flex items-center space-x-1.5 text-slate-300 hover:text-amber-300">
+        <i class="fa-solid fa-music"></i>
+        <span>เวทีรำวงย้อนยุค</span>
+      </button>
+    </nav>
+
+    <!-- Global Controls: BGM, Settings, Table -->
+    <div class="flex items-center space-x-2">
+      <!-- Music toggle button -->
+      <button id="bgmToggleBtn" onclick="toggleBGM()" title="เปิด/ปิดเสียงดนตรีไทยบรรเลง" class="w-8 h-8 rounded-full bg-slate-800/90 hover:bg-slate-700 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xs shadow-md transition-transform active:scale-90">
+        <i id="bgmIcon" class="fa-solid fa-volume-xmark"></i>
+      </button>
+
+      <!-- View Participants Directory Modal Button -->
+      <button onclick="openDirectoryModal()" title="ดูรายชื่อผู้ร่วมลอยกระทงทั้งหมด" class="hidden sm:flex items-center space-x-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 px-2.5 py-1 rounded-full text-xs transition-all shadow-sm">
+        <i class="fa-solid fa-list-check"></i>
+        <span>รายชื่อทั้งหมด</span>
+      </button>
+
+      <!-- Admin Settings Button -->
+      <button onclick="openAdminSettingsModal()" title="ตั้งค่าระบบ (Admin)" class="w-8 h-8 rounded-full bg-slate-800/90 hover:bg-slate-700 border border-slate-600 flex items-center justify-center text-slate-300 text-xs shadow-md transition-transform active:scale-90">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- MAIN SWIPEABLE VIEWPORT (3 PAGES)          -->
+  <!-- ========================================== -->
+  <main id="swipeViewport" class="flex-1 w-full overflow-hidden relative">
+    
+    <!-- Desktop Left/Right Navigation Arrows -->
+    <button onclick="prevPage()" id="prevPageBtn" class="hidden lg:flex absolute left-3 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full bg-slate-900/80 hover:bg-amber-500 hover:text-slate-950 text-amber-400 border border-amber-500/40 items-center justify-center shadow-xl backdrop-blur-sm transition-all duration-200 opacity-60 hover:opacity-100">
+      <i class="fa-solid fa-chevron-left text-base"></i>
+    </button>
+    <button onclick="nextPage()" id="nextPageBtn" class="hidden lg:flex absolute right-3 top-1/2 -translate-y-1/2 z-40 w-11 h-11 rounded-full bg-slate-900/80 hover:bg-amber-500 hover:text-slate-950 text-amber-400 border border-amber-500/40 items-center justify-center shadow-xl backdrop-blur-sm transition-all duration-200 opacity-60 hover:opacity-100">
+      <i class="fa-solid fa-chevron-right text-base"></i>
+    </button>
+
+    <!-- Container that slides horizontally -->
+    <div id="swipeContainer">
+      
+      <!-- ======================================================== -->
+      <!-- PAGE 1: ท่าน้ำลอยกระทง & ปล่อยโคมลอย (MAIN RIVER & PIER) -->
+      <!-- ======================================================== -->
+      <section id="page-0" class="page-section flex flex-col justify-between">
+        
+        <!-- Live Floating River & Sky Canvas Layer -->
+        <canvas id="riverCanvas"></canvas>
+
+        <!-- Dynamic River Atmosphere Background (Vibrant Twilight & Glowing Water) -->
+        <div id="riverBackdrop" class="absolute inset-0 pointer-events-none transition-all duration-700">
+          <!-- Background Template: 1) ท่าน้ำวิทยาลัย, 2) คืนเดือนเพ็ญ, 3) งานวัดริมน้ำ (Updated via JS) -->
+          <div id="backdropSky" class="absolute inset-0 bg-gradient-to-b from-[#1E1B4B] via-[#1E3A8A] via-[#1D4ED8]/45 to-[#0284C7]/85"></div>
+          
+          <!-- Moon & Stars with vibrant golden halo -->
+          <div id="fullMoon" class="absolute top-6 right-10 w-24 h-24 rounded-full bg-gradient-to-tr from-amber-100 via-amber-200 to-yellow-300 shadow-[0_0_80px_rgba(253,230,138,0.95)] animate-pulse-glow">
+            <div class="absolute -inset-4 rounded-full bg-amber-400/20 blur-xl"></div>
+            <div class="absolute inset-0 rounded-full opacity-15 bg-[radial-gradient(circle_at_30%_30%,#000,transparent)]"></div>
+          </div>
+          
+          <!-- Temple & Pier Silhouettes / Scenery with warm glowing temple festival lights -->
+          <div id="backdropScenery" class="absolute bottom-32 w-full h-40 opacity-80 flex justify-between items-end px-6">
+            <!-- Pagoda Silhouette with gold edge glow -->
+            <svg class="h-32 text-indigo-950 fill-current filter drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" viewBox="0 0 100 120">
+              <path d="M50 0 L52 15 L60 20 L50 22 L40 20 L48 15 Z M50 25 L65 40 L50 44 L35 40 Z M50 45 L75 70 L50 75 L25 70 Z M50 78 L90 115 L10 115 Z"/>
+            </svg>
+            <!-- Campus Building / Thai Pavilion Silhouette with glowing windows -->
+            <svg class="h-28 text-indigo-950 fill-current hidden sm:block filter drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]" viewBox="0 0 160 100">
+              <polygon points="80,5 95,25 150,30 135,45 155,70 145,95 15,95 5,70 25,45 10,30 65,25" />
+            </svg>
+            <!-- Coconut & Riverside Trees -->
+            <svg class="h-36 text-indigo-950 fill-current filter drop-shadow-[0_0_6px_rgba(14,165,233,0.3)]" viewBox="0 0 100 120">
+              <path d="M48,120 Q55,60 52,30 Q30,10 5,25 Q35,28 48,32 Q50,0 75,5 Q60,18 55,30 Q80,15 95,35 Q68,36 56,35 Z"/>
+            </svg>
+          </div>
+
+          <!-- Luminous River Water Wave -->
+          <div class="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#0C4A6E] via-[#0284C7]/70 to-transparent">
+            <div class="water-wave"></div>
+          </div>
+        </div>
+
+        <!-- Top Floating Controls: Stats & Quick Modals -->
+        <div class="relative z-20 p-3 sm:p-4 flex items-center justify-between">
+          <!-- Real-Time Counter Stats -->
+          <div class="flex items-center space-x-2 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-amber-500/30 shadow-md">
+            <span class="flex h-2.5 w-2.5 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <div class="text-[11px] sm:text-xs">
+              <span class="text-slate-300">ลอยแล้ว:</span>
+              <span id="statKrathongCount" class="font-bold text-amber-400 ml-1">0</span> <span class="text-slate-400">กระทง</span>
+              <span class="mx-1 text-slate-600">|</span>
+              <span id="statLanternCount" class="font-bold text-pink-400">0</span> <span class="text-slate-400">โคม</span>
+            </div>
+          </div>
+
+          <!-- River Scene Selector -->
+          <div class="flex items-center space-x-1.5 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded-full border border-slate-700/60 shadow-md text-xs">
+            <span class="text-slate-300 hidden sm:inline text-[11px]"><i class="fa-solid fa-image text-amber-400 mr-1"></i>ฉากน้ำ:</span>
+            <select id="bgThemeSelect" onchange="changeRiverScene(this.value)" class="bg-transparent text-amber-300 text-xs focus:outline-none cursor-pointer">
+              <option value="campus" class="bg-slate-900 text-slate-100">ท่าน้ำวิทยาลัย</option>
+              <option value="moon" class="bg-slate-900 text-slate-100">คืนเดือนเพ็ญ</option>
+              <option value="temple" class="bg-slate-900 text-slate-100">งานวัดริมน้ำ</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Floating Krathong & Lantern interactive target container (Full-screen overlay on the river & sky) -->
+        <div id="floatingRiverItems" class="absolute inset-0 z-20 overflow-hidden pointer-events-none">
+          <!-- Dynamic floating elements will be injected and animated here with pointer-events-auto -->
+        </div>
+
+        <!-- Flex Spacer to keep top controls and bottom action bar positioned properly -->
+        <div class="flex-1 pointer-events-none"></div>
+
+        <!-- Bottom Action Bar / DIY Floating Action Button -->
+        <div class="relative z-30 p-3 sm:p-5 flex flex-col items-center justify-center">
+          <!-- Floating Notice Banner -->
+          <div class="mb-2 text-center text-xs text-amber-200/80 bg-slate-950/60 px-4 py-1 rounded-full backdrop-blur-sm border border-amber-500/20">
+            <i class="fa-solid fa-sparkles text-amber-400 mr-1"></i>
+            คลิกที่กระทงหรือโคมในสายน้ำเพื่อเปิดดูคำอธิษฐานและส่งกำลังใจ ❤️
+          </div>
+
+          <!-- Main Launch DIY Button -->
+          <div class="flex items-center space-x-3 w-full max-w-sm justify-center">
+            <button onclick="openDIYModal('krathong')" class="flex-1 py-3 px-4 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 text-slate-950 font-bold rounded-2xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 hover:brightness-110 active:scale-95 transition-all duration-150 flex items-center justify-center space-x-2 text-sm sm:text-base border border-amber-300/60">
+              <span class="text-xl">🪷</span>
+              <span>ประดิษฐ์กระทง</span>
+            </button>
+            <button onclick="openDIYModal('lantern')" class="flex-1 py-3 px-4 bg-gradient-to-r from-pink-500 via-rose-600 to-pink-500 text-white font-bold rounded-2xl shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50 hover:brightness-110 active:scale-95 transition-all duration-150 flex items-center justify-center space-x-2 text-sm sm:text-base border border-pink-300/60">
+              <span class="text-xl">🏮</span>
+              <span>ปล่อยโคมลอย</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- PAGE 2: ซุ้มเซียมซีดิจิทัล & ดูดวง (DIGITAL ESIIMSI)      -->
+      <!-- ======================================================== -->
+      <section id="page-1" class="page-section flex flex-col justify-between p-4 sm:p-6 bg-gradient-to-b from-[#4C1D95] via-[#581C87] via-[#3B0764] to-[#1E1B4B] relative overflow-hidden">
+        
+        <!-- Festive Thai Temple Ambient Glow & Lanterns -->
+        <div class="absolute -top-10 -left-10 w-44 h-44 rounded-full bg-amber-400/20 blur-3xl pointer-events-none"></div>
+        <div class="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-pink-500/20 blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full bg-amber-500/15 blur-3xl pointer-events-none"></div>
+        
+        <!-- Header of Temple Fortune Booth -->
+        <div class="text-center relative z-10 max-w-lg mx-auto w-full pt-1">
+          <div class="inline-flex items-center space-x-2 bg-amber-500/10 border border-amber-500/40 text-amber-300 text-xs px-3 py-1 rounded-full mb-1">
+            <i class="fa-solid fa-om"></i>
+            <span>ซุ้มเซียมซีศักดิ์สิทธิ์ ณ วิทยาลัยเทคนิคท่าหลวงฯ</span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-bold text-amber-400 glow-gold tracking-wide">
+            เซียมซีดิจิทัล & ทำนายดวงชะตา
+          </h2>
+          <p class="text-xs text-slate-300 mt-1">
+            เขย่ากระบอกติ้วเซียมซีเพื่อดูดวงการเรียน การงาน ความรัก และโชคลาภสไตล์เด็กอาชีวะ
+          </p>
+        </div>
+
+        <!-- Interactive Shaking Cylinder & Stick Stage -->
+        <div class="flex-1 flex flex-col items-center justify-center my-4 relative">
+          
+          <!-- Esiimsi Bamboo Cup Container -->
+          <div id="esiimsiCupContainer" class="relative cursor-pointer group flex flex-col items-center" onclick="shakeEsiimsi()">
+            <!-- Glow background effect -->
+            <div class="absolute -inset-4 bg-amber-500/20 rounded-full blur-2xl group-hover:bg-amber-500/30 transition-all"></div>
+
+            <!-- Dropping Stick (Reveals on shake) -->
+            <div id="fallingStick" class="stick-animate transition-all duration-700 opacity-0 -translate-y-8 z-30 mb-[-25px]">
+              <div class="w-7 h-28 bg-gradient-to-b from-amber-200 via-amber-100 to-amber-300 rounded-md border-2 border-amber-600 shadow-xl flex flex-col items-center justify-between p-1 text-slate-900 font-bold text-xs">
+                <span class="text-[9px] text-red-600 font-black">เลข</span>
+                <span id="esiimsiStickNumber" class="text-base text-red-700 font-black my-auto">9</span>
+                <span class="text-[9px] text-amber-800">โชคดี</span>
+              </div>
+            </div>
+
+            <!-- Bamboo Shaker Cylinder (SVG Artwork) -->
+            <div id="bambooCylinder" class="relative z-20 transition-transform">
+              <svg width="150" height="200" viewBox="0 0 150 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Staves in the cup -->
+                <path d="M45 40 L55 5 L62 40 M65 40 L75 2 L82 40 M85 40 L95 8 L102 40 M55 40 L40 10 L50 40 M95 40 L110 12 L100 40" stroke="#E2B16F" stroke-width="6" stroke-linecap="round"/>
+                <path d="M48 38 L55 5 M68 38 L75 2 M88 38 L95 8" stroke="#DC2626" stroke-width="4" stroke-linecap="round"/>
+                
+                <!-- Main Bamboo Body -->
+                <path d="M30 45 C30 35, 120 35, 120 45 L112 185 C112 195, 38 195, 38 185 Z" fill="url(#bambooGrad)" stroke="#5C3317" stroke-width="4"/>
+                
+                <!-- Gold Ornamental Bands -->
+                <path d="M32 75 C32 70, 118 70, 118 75 L116 87 C116 92, 34 92, 34 87 Z" fill="#F59E0B" stroke="#B45309" stroke-width="1.5"/>
+                <path d="M36 145 C36 140, 114 140, 114 145 L113 157 C113 162, 37 162, 37 157 Z" fill="#F59E0B" stroke="#B45309" stroke-width="1.5"/>
+                
+                <!-- Thai Emblem / Inscription -->
+                <circle cx="75" cy="116" r="18" fill="#B45309" stroke="#FDE68A" stroke-width="2"/>
+                <text x="75" y="122" font-size="14" font-weight="bold" fill="#FEF3C7" text-anchor="middle" font-family="'Kanit'">ท.ล.</text>
+                
+                <!-- Gradients -->
+                <defs>
+                  <linearGradient id="bambooGrad" x1="30" y1="45" x2="120" y2="45" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#78350F" />
+                    <stop offset="30%" stop-color="#92400E" />
+                    <stop offset="60%" stop-color="#B45309" />
+                    <stop offset="90%" stop-color="#92400E" />
+                    <stop offset="100%" stop-color="#5C3317" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+
+            <!-- Shake Hint -->
+            <div class="mt-2 flex items-center space-x-1.5 text-xs text-amber-300/80 bg-slate-900/80 px-3 py-1 rounded-full border border-amber-500/30">
+              <i class="fa-solid fa-hand-pointer animate-bounce"></i>
+              <span>คลิกที่กระบอก หรือเขย่ามือถือเพื่อเสี่ยงทาย</span>
+            </div>
+          </div>
+
+          <!-- Fortune Paper Slip Card (Display after shaking) -->
+          <div id="fortuneResultCard" class="hidden max-w-sm w-full bg-[#FFFDF5] text-slate-800 rounded-2xl p-5 shadow-2xl border-4 border-amber-500 relative z-30 animate-fade-in mt-3">
+            <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-red-600 text-white font-bold text-xs px-4 py-0.5 rounded-full shadow-md">
+              ใบเซียมซีนำโชค
+            </div>
+            
+            <!-- Result Title -->
+            <div class="text-center border-b border-amber-200 pb-2 mb-2">
+              <h3 id="fortuneTitle" class="text-base font-bold text-red-700">ใบที่ ๙: เทพเทวาอำนวยพร</h3>
+              <p class="text-[11px] text-slate-500">วิทยาลัยเทคนิคท่าหลวงซิเมนต์ไทยอนุสรณ์</p>
+            </div>
+
+            <!-- Fortune Content Categories -->
+            <div class="space-y-1.5 text-xs">
+              <div class="bg-amber-50 p-2 rounded-lg border border-amber-200">
+                <p id="fortunePoem" class="italic text-center text-amber-900 font-medium">"เกรดสี่อยู่ไม่ไกล แต่อย่าลืมส่งงานอาจารย์ให้ครบถ้วน"</p>
+              </div>
+              <div class="grid grid-cols-3 gap-1.5 text-[11px] pt-1">
+                <div class="bg-blue-50 p-1.5 rounded text-center border border-blue-100">
+                  <span class="block text-blue-700 font-bold"><i class="fa-solid fa-graduation-cap"></i> การเรียน</span>
+                  <span id="fortuneStudy" class="text-slate-700 text-[10px]">ผ่านฉลุย ไร้โปรเจกต์ค้าง</span>
+                </div>
+                <div class="bg-pink-50 p-1.5 rounded text-center border border-pink-100">
+                  <span class="block text-pink-700 font-bold"><i class="fa-solid fa-heart"></i> ความรัก</span>
+                  <span id="fortuneLove" class="text-slate-700 text-[10px]">พบคนรู้ใจริมท่าน้ำ</span>
+                </div>
+                <div class="bg-emerald-50 p-1.5 rounded text-center border border-emerald-100">
+                  <span class="block text-emerald-700 font-bold"><i class="fa-solid fa-coins"></i> โชคลาภ</span>
+                  <span id="fortuneLuck" class="text-slate-700 text-[10px]">มีลาภลอยจากเพื่อนสนิท</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action buttons: Save Image for IG/FB Story & Shake Again -->
+            <div class="flex items-center space-x-2 mt-4 pt-2 border-t border-slate-200">
+              <button onclick="downloadFortuneCard()" class="flex-1 py-2 px-3 bg-gradient-to-r from-red-600 to-amber-600 hover:brightness-110 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-1 shadow-md">
+                <i class="fa-solid fa-download"></i>
+                <span>บันทึกรูปลงสตอรี่ IG/FB</span>
+              </button>
+              <button onclick="resetEsiimsi()" class="py-2 px-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs">
+                <i class="fa-solid fa-rotate-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shake Button (for mobile users without motion sensor) -->
+        <div class="w-full max-w-xs mx-auto pb-2 z-10">
+          <button onclick="shakeEsiimsi()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold rounded-2xl shadow-lg shadow-amber-500/30 active:scale-95 transition-all text-sm flex items-center justify-center space-x-2 border border-amber-300/40">
+            <i class="fa-solid fa-hand-sparkles text-lg"></i>
+            <span>กดเขย่าเซียมซีนำโชค</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- PAGE 3: เวทีรำวงย้อนยุค & ดนตรีสด (RETRO RAMWONG STAGE) -->
+      <!-- ======================================================== -->
+      <section id="page-2" class="page-section flex flex-col justify-between p-3 sm:p-5 bg-gradient-to-b from-[#831843] via-[#701A75] via-[#581C87] to-[#2E1065] relative overflow-hidden">
+        
+        <!-- Temple Fair Radiant Stage Lights & Carnival Ambience -->
+        <div class="absolute top-0 left-1/4 w-72 h-72 rounded-full bg-pink-500/25 blur-3xl pointer-events-none"></div>
+        <div class="absolute top-0 right-1/4 w-72 h-72 rounded-full bg-yellow-400/25 blur-3xl pointer-events-none"></div>
+        
+        <!-- Temple Fair Lights Banner -->
+        <div class="w-full relative z-10 text-center pt-1">
+          <!-- Multi-colored Festive Flashing Lights Row -->
+          <div class="flex justify-center items-center py-1 overflow-hidden" id="fairyLightsRow">
+            <span class="fair-bulb text-pink-500 bg-pink-500"></span>
+            <span class="fair-bulb text-yellow-400 bg-yellow-400"></span>
+            <span class="fair-bulb text-emerald-400 bg-emerald-400"></span>
+            <span class="fair-bulb text-cyan-400 bg-cyan-400"></span>
+            <span class="fair-bulb text-purple-400 bg-purple-400"></span>
+            <span class="fair-bulb text-rose-500 bg-rose-500"></span>
+            <span class="fair-bulb text-amber-400 bg-amber-400"></span>
+            <span class="fair-bulb text-blue-400 bg-blue-400"></span>
+            <span class="fair-bulb text-pink-400 bg-pink-400"></span>
+          </div>
+
+          <h2 class="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-amber-300 to-yellow-400 tracking-wide glow-gold uppercase">
+            เวทีรำวงย้อนยุคชาวท่าหลวง
+          </h2>
+          <p class="text-xs text-pink-200">
+            ดนตรีสด โยกย้ายส่ายสะโพก สนุกสนานรับคืนวันเพ็ญเดือนสิบสอง
+          </p>
+        </div>
+
+        <!-- Live Ramwong Stage & Animated Dancers -->
+        <div class="flex-1 flex flex-col items-center justify-end relative my-2 min-h-[260px] overflow-hidden">
+          
+          <!-- Flying Flowers & Hearts Canvas / Layer -->
+          <div id="stageParticleOverlay" class="absolute inset-0 pointer-events-none z-30"></div>
+
+          <!-- Temple Fair Stage Backdrop (Wat Stage Banner) -->
+          <div class="w-full max-w-xl h-24 bg-gradient-to-r from-indigo-950 via-purple-900 to-indigo-950 rounded-t-3xl border-t-2 border-x-2 border-pink-500/40 p-2 flex flex-col items-center justify-start shadow-2xl relative">
+            <div class="text-[11px] sm:text-xs text-amber-300 font-bold bg-pink-900/60 px-4 py-0.5 rounded-full border border-pink-400/40">
+              🎪 เวทีดนตรีสด แผนกวิชาเทคโนโลยีคอมพิวเตอร์ 🎪
+            </div>
+            <!-- Vintage Disco Ball / Spotlight -->
+            <div class="w-8 h-8 rounded-full bg-slate-300 border border-white shadow-[0_0_20px_#fff] mt-1 animate-pulse"></div>
+          </div>
+
+          <!-- The Dancers on Stage (Auto-selected from recent participants) -->
+          <div id="dancersStageContainer" class="w-full max-w-xl bg-gradient-to-b from-[#2B1045] to-[#120521] border-2 border-amber-500/50 rounded-2xl shadow-[0_0_35px_rgba(236,72,153,0.3)] p-3 relative z-20 flex items-end justify-around min-h-[170px]">
+            <!-- Dynamic Dancers injected by JS -->
+          </div>
+
+          <!-- Stage Wooden Plinth Base -->
+          <div class="w-full max-w-2xl h-8 bg-gradient-to-r from-amber-900 via-amber-700 to-amber-900 rounded-b-xl border-t-2 border-amber-400/60 shadow-xl flex items-center justify-around text-[10px] text-amber-200 font-semibold px-4">
+            <span>🌺 วิทยาลัยเทคนิคท่าหลวงฯ 🌺</span>
+            <span>🎶 จังหวะรำวงมาตรฐาน 🎶</span>
+          </div>
+        </div>
+
+        <!-- Audience Cheer & Interactive Controls -->
+        <div class="w-full max-w-md mx-auto space-y-2 z-20 pb-2">
+          
+          <!-- Live Cheer Counters -->
+          <div class="flex justify-around items-center bg-slate-900/80 backdrop-blur-md rounded-xl p-2 border border-pink-500/30 text-xs">
+            <div class="flex items-center space-x-1.5">
+              <span class="text-xl">🌸</span>
+              <div>
+                <div class="text-[10px] text-slate-400">พวงมาลัยที่คล้อง</div>
+                <div id="countGarlands" class="font-bold text-pink-400 text-sm">0 พวง</div>
+              </div>
+            </div>
+            <div class="h-6 w-[1px] bg-slate-700"></div>
+            <div class="flex items-center space-x-1.5">
+              <span class="text-xl">👏</span>
+              <div>
+                <div class="text-[10px] text-slate-400">เสียงปรบมือเชียร์</div>
+                <div id="countClaps" class="font-bold text-amber-400 text-sm">0 ครั้ง</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cheer Buttons -->
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="cheerAction('flower')" class="py-3 px-3 bg-gradient-to-r from-pink-500 to-rose-600 hover:brightness-110 active:scale-95 text-white font-bold rounded-2xl shadow-lg shadow-pink-500/30 flex items-center justify-center space-x-2 text-xs sm:text-sm border border-pink-300/40 transition-all">
+              <span class="text-lg">🌺</span>
+              <span>คล้องพวงมาลัย</span>
+            </button>
+            <button onclick="cheerAction('clap')" class="py-3 px-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 active:scale-95 text-slate-950 font-bold rounded-2xl shadow-lg shadow-amber-500/30 flex items-center justify-center space-x-2 text-xs sm:text-sm border border-amber-300/40 transition-all">
+              <span class="text-lg">👏</span>
+              <span>ปรบมือ / กรี๊ดดด</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MOBILE BOTTOM NAVIGATION BAR & SWIPE DOTS   -->
+  <!-- ========================================== -->
+  <div class="md:hidden w-full bg-[#181136]/95 backdrop-blur-md border-t border-purple-800/40 px-4 py-2 z-40 flex items-center justify-around flex-shrink-0">
+    <button onclick="switchPage(0)" id="mob-btn-0" class="flex flex-col items-center text-amber-400 font-bold">
+      <i class="fa-solid fa-water text-lg"></i>
+      <span class="text-[10px] mt-0.5">ท่าน้ำ</span>
+    </button>
+    <button onclick="switchPage(1)" id="mob-btn-1" class="flex flex-col items-center text-slate-300">
+      <i class="fa-solid fa-scroll text-lg"></i>
+      <span class="text-[10px] mt-0.5">เซียมซี</span>
+    </button>
+    <button onclick="switchPage(2)" id="mob-btn-2" class="flex flex-col items-center text-slate-300">
+      <i class="fa-solid fa-music text-lg"></i>
+      <span class="text-[10px] mt-0.5">รำวง</span>
+    </button>
+    <button onclick="openDirectoryModal()" class="flex flex-col items-center text-slate-300">
+      <i class="fa-solid fa-users text-lg"></i>
+      <span class="text-[10px] mt-0.5">รายชื่อ</span>
+    </button>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- GLOBAL FOOTER & DONATE BUTTON              -->
+  <!-- ========================================== -->
+  <footer class="w-full bg-[#181136]/95 border-t border-purple-800/50 px-3 py-1.5 flex flex-wrap items-center justify-between text-[11px] text-slate-300 z-40 flex-shrink-0">
+    <div class="flex items-center space-x-1.5">
+      <span class="text-amber-400">✨</span>
+      <span>พัฒนาโดย <strong>แผนกวิชาเทคโนโลยีคอมพิวเตอร์ 68</strong> วิทยาลัยเทคนิคท่าหลวงซิเมนต์ไทยอนุสรณ์</span>
+    </div>
+    
+    <!-- Minimal Subtle Donate Button -->
+    <button onclick="openDonateModal()" class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-amber-300 border border-slate-700 text-[10px] transition-all my-0.5">
+      <i class="fa-solid fa-heart text-pink-500 text-[9px]"></i>
+      <span>สนับสนุนผู้พัฒนา</span>
+    </button>
+  </footer>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 1: DIY KRATHONG & SKY LANTERN BUILDER              -->
+  <!-- ======================================================== -->
+  <div id="diyModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-gradient-to-b from-[#111A36] to-[#0A0F21] w-full max-w-xl rounded-3xl border border-amber-500/40 shadow-2xl p-4 sm:p-6 relative max-h-[95vh] overflow-y-auto no-scrollbar">
+      
+      <!-- Close Button -->
+      <button onclick="closeDIYModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="text-center mb-4">
+        <h3 id="diyModalTitle" class="text-lg sm:text-xl font-bold text-amber-400 glow-gold">
+          ประดิษฐ์กระทงออนไลน์
+        </h3>
+        <p class="text-xs text-slate-300">
+          ปรับแต่งกระทง ปักรูปถ่ายของตัวเอง และร่วมส่งคำอธิษฐานลงสู่สายน้ำ
+        </p>
+      </div>
+
+      <!-- STEP 1: User Profile & Avatar -->
+      <div class="bg-slate-900/70 p-3.5 rounded-2xl border border-slate-800 mb-3 space-y-3">
+        <div class="text-xs font-semibold text-amber-300 flex items-center space-x-1.5">
+          <span class="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-[10px] text-amber-400">1</span>
+          <span>ข้อมูลผู้ลอยกระทง & อวตารตัวละคร</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[11px] text-slate-300 mb-1">ชื่อ - นามสกุล *</label>
+            <input type="text" id="inputFullName" placeholder="เช่น นายสมชาย สายชล" class="w-full bg-slate-800 text-xs px-3 py-2 rounded-xl border border-slate-700 text-white focus:outline-none focus:border-amber-400">
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-300 mb-1">แผนกวิชา *</label>
+            <select id="selectDepartment" class="w-full bg-slate-800 text-xs px-3 py-2 rounded-xl border border-slate-700 text-amber-200 focus:outline-none focus:border-amber-400">
+              <!-- Departments injected dynamically -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Avatar Selection (Cute Cartoon SVG Avatars) -->
+        <div>
+          <label class="block text-[11px] text-slate-300 mb-1.5">เลือกตัวละครแทนตัวเอง:</label>
+          <div class="grid grid-cols-6 gap-2" id="avatarSelectorGrid">
+            <!-- 6 Avatar choices injected by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: DIY Customizer & Photo Attachment with Live Preview -->
+      <div class="bg-slate-900/70 p-3.5 rounded-2xl border border-slate-800 mb-3 space-y-3">
+        <div class="text-xs font-semibold text-amber-300 flex items-center justify-between">
+          <div class="flex items-center space-x-1.5">
+            <span class="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-[10px] text-amber-400">2</span>
+            <span id="diyStep2Title">ตกแต่งกระทง & รูปภาพติดกระทง</span>
+          </div>
+          <span class="text-[10px] text-emerald-400">พรีวิวแบบเรียลไทม์</span>
+        </div>
+
+        <!-- LIVE PREVIEW CANVAS / SVG STAGE -->
+        <div class="w-full h-48 bg-gradient-to-b from-[#0B1530] to-[#040B1A] rounded-2xl border-2 border-dashed border-amber-500/30 flex items-center justify-center relative overflow-hidden shadow-inner">
+          <div id="liveDiyPreview" class="w-full h-full flex items-center justify-center relative">
+            <!-- Rendered by renderDiyPreview() -->
+          </div>
+          <div class="absolute bottom-1 right-2 text-[10px] text-slate-400">
+            ตัวอย่างกระทงเมื่อลอยจริง
+          </div>
+        </div>
+
+        <!-- Photo Upload & Frame Selection -->
+        <div class="p-2.5 bg-slate-800/60 rounded-xl border border-slate-700 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] text-amber-200 font-medium">
+              <i class="fa-solid fa-camera mr-1"></i>รูปภาพติดกระทง (ตัดกรอบสวยๆ):
+            </span>
+            <button type="button" onclick="document.getElementById('photoInput').click()" class="text-xs bg-amber-500 text-slate-950 px-2.5 py-1 rounded-lg font-bold hover:bg-amber-400">
+              อัปโหลดรูป
+            </button>
+            <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
+          </div>
+
+          <div class="flex items-center space-x-3 text-xs text-slate-300">
+            <label class="flex items-center space-x-1 cursor-pointer">
+              <input type="radio" name="photoFrameStyle" value="circle" checked onchange="updateDiyItem()" class="text-amber-500">
+              <span class="text-[11px]">กรอบวงกลมทอง</span>
+            </label>
+            <label class="flex items-center space-x-1 cursor-pointer">
+              <input type="radio" name="photoFrameStyle" value="heart" onchange="updateDiyItem()" class="text-pink-500">
+              <span class="text-[11px]">กรอบรูปหัวใจชมพู</span>
+            </label>
+            <label class="flex items-center space-x-1 cursor-pointer">
+              <input type="radio" name="photoFrameStyle" value="flower" onchange="updateDiyItem()" class="text-yellow-400">
+              <span class="text-[11px]">กรอบดอกบัววิจิตร</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Krathong / Lantern Component Controls -->
+        <div id="krathongCustomizerControls" class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-1">ฐานกระทง:</label>
+            <select id="selKrathongBase" onchange="updateDiyItem()" class="w-full bg-slate-800 text-[11px] p-1.5 rounded-lg border border-slate-700 text-white">
+              <option value="banana">หยวกกล้วยใบตอง</option>
+              <option value="lotus">กลีบดอกบัวชมพู</option>
+              <option value="ice">กระทงน้ำแข็งรักโลก</option>
+              <option value="bread">กระทงขนมปังปลา</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-1">ดอกไม้ประดับ:</label>
+            <select id="selKrathongFlowers" onchange="updateDiyItem()" class="w-full bg-slate-800 text-[11px] p-1.5 rounded-lg border border-slate-700 text-white">
+              <option value="marigold">ดอกดาวเรืองทอง</option>
+              <option value="orchid">ดอกกล้วยไม้ม่วง</option>
+              <option value="jasmine">ดอกมะลิบริสุทธิ์</option>
+              <option value="mixed">รวมดอกไม้มงคล</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-1">ธูป-เทียน:</label>
+            <select id="selKrathongCandle" onchange="updateDiyItem()" class="w-full bg-slate-800 text-[11px] p-1.5 rounded-lg border border-slate-700 text-white">
+              <option value="gold">เทียนทอง 3 เล่ม</option>
+              <option value="red">เทียนแดงมงคล</option>
+              <option value="lotus">เทียนหอมดอกบัว</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-1">ของตกแต่ง:</label>
+            <select id="selKrathongDecor" onchange="updateDiyItem()" class="w-full bg-slate-800 text-[11px] p-1.5 rounded-lg border border-slate-700 text-white">
+              <option value="sparkle">แสงไฟระยิบระยับ</option>
+              <option value="coins">เหรียญทองมงคล</option>
+              <option value="ribbon">โบว์ชมพูหวาน</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Lantern Customizer Controls (Hidden when Krathong is chosen) -->
+        <div id="lanternCustomizerControls" class="hidden grid grid-cols-3 gap-2 text-xs">
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-1">ทรงโคมลอย:</label>
+            <select id="selLanternShape" onchange="updateDiyItem()" class="w-full bg-slate-800 text-[11px] p-1.5 rounded-lg border border-slate-700 text-white">
+              <option value="traditional">ทรงกระบอกล้านนา</option>
+              <option value="oval">ทรงไข่มุกกลม</option>
+              <option value="star">ทรงแปดเหลี่ยมมงคล</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-1">สีโคมลอย:</label>
+            <select id="selLanternColor" onchange="updateDiyItem()" class="w-full bg-slate-800 text-[11px] p-1.5 rounded-lg border border-slate-700 text-white">
+              <option value="#FBBF24">เหลืองนวลทอง</option>
+              <option value="#EC4899">ชมพูหวานแหวว</option>
+              <option value="#38BDF8">ฟ้าครามสดใส</option>
+              <option value="#A855F7">ม่วงมีเสน่ห์</option>
+              <option value="#34D399">เขียวมรกต</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] text-slate-400 mb-1">ลวดลายโคม:</label>
+            <select id="selLanternPattern" onchange="updateDiyItem()" class="w-full bg-slate-800 text-[11px] p-1.5 rounded-lg border border-slate-700 text-white">
+              <option value="thai">ลายประจำยามไทย</option>
+              <option value="stars">ลายดาวระยิบระยับ</option>
+              <option value="heart">ลายหัวใจสุขสันต์</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Wish & Category Selector -->
+      <div class="bg-slate-900/70 p-3.5 rounded-2xl border border-slate-800 mb-4 space-y-2.5">
+        <div class="flex items-center justify-between text-xs font-semibold text-amber-300">
+          <div class="flex items-center space-x-1.5">
+            <span class="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center text-[10px] text-amber-400">3</span>
+            <span>คำอธิษฐาน & ส่งต่อความปรารถนาดี</span>
+          </div>
+          <span id="charCounter" class="text-[10px] text-slate-400">0/150</span>
+        </div>
+
+        <!-- Quick Presets / Randomizer Category Buttons -->
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" onclick="pickPresetWish('khoma')" class="text-[10px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-amber-500/20 text-amber-300 border border-slate-700">
+            🙏 ขอขมาพระแม่คงคา
+          </button>
+          <button type="button" onclick="pickPresetWish('study')" class="text-[10px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-blue-500/20 text-blue-300 border border-slate-700">
+            📚 การเรียน/สอบผ่าน
+          </button>
+          <button type="button" onclick="pickPresetWish('love')" class="text-[10px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-pink-500/20 text-pink-300 border border-slate-700">
+            💖 ความรัก/คนรู้ใจ
+          </button>
+          <button type="button" onclick="pickPresetWish('health')" class="text-[10px] px-2.5 py-1 rounded-full bg-slate-800 hover:bg-emerald-500/20 text-emerald-300 border border-slate-700">
+            🍀 สุขภาพ/ครอบครัว
+          </button>
+        </div>
+
+        <textarea id="inputWish" rows="2" maxlength="150" oninput="updateCharCount()" placeholder="พิมพ์คำอธิษฐานในคืนวันเพ็ญของคุณที่นี่..." class="w-full bg-slate-800 text-xs px-3 py-2 rounded-xl border border-slate-700 text-white focus:outline-none focus:border-amber-400 resize-none"></textarea>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center space-x-3">
+        <button type="button" onclick="closeDIYModal()" class="w-1/3 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700">
+          ยกเลิก
+        </button>
+        <button type="button" id="submitLaunchBtn" onclick="submitLaunchItem()" class="w-2/3 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 text-slate-950 text-xs sm:text-sm font-bold shadow-lg shadow-amber-500/30 hover:brightness-110 active:scale-95 flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span id="submitLaunchBtnText">ปล่อยกระทงลงสายน้ำ</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 2: FULL DETAILS OF FLOATING KRATHONG / LANTERN    -->
+  <!-- ======================================================== -->
+  <div id="detailModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-gradient-to-b from-[#101935] to-[#0A0E21] w-full max-w-sm rounded-3xl border-2 border-amber-500/50 p-5 shadow-2xl relative text-center">
+      
+      <!-- Close button -->
+      <button onclick="closeDetailModal()" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-xs">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- User Attached Photo or Avatar Badge -->
+      <div class="relative w-28 h-28 mx-auto mb-3">
+        <div id="detailPhotoContainer" class="w-28 h-28 rounded-full border-4 border-amber-400 shadow-xl overflow-hidden bg-slate-800 flex items-center justify-center">
+          <img id="detailUserImg" src="" alt="User" class="w-full h-full object-cover">
+        </div>
+        <div id="detailTypeBadge" class="absolute -bottom-1 -right-1 bg-amber-500 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
+          กระทง
+        </div>
+      </div>
+
+      <!-- User Name & Department -->
+      <h3 id="detailFullName" class="text-base font-bold text-amber-300 glow-gold">นายสมชาย สายชล</h3>
+      <p id="detailDepartment" class="text-xs text-slate-400 mb-3">แผนกวิชาเทคโนโลยีคอมพิวเตอร์</p>
+
+      <!-- Wish Card -->
+      <div class="bg-slate-900/90 p-3.5 rounded-2xl border border-slate-700/80 mb-4 text-left shadow-inner">
+        <div class="text-[10px] text-amber-400 font-semibold mb-1 flex items-center space-x-1">
+          <i class="fa-solid fa-comment-dots"></i>
+          <span>คำอธิษฐานฉบับเต็ม:</span>
+        </div>
+        <p id="detailWish" class="text-xs text-slate-200 leading-relaxed italic">
+          "ขอขมาพระแม่คงคา ขอให้โปรเจกต์คอมพิวเตอร์ผ่านฉลุย เกรดสี่ทุกวิชา และขอให้ทุกคนมีความสุขครับ"
+        </p>
+        <div id="detailTime" class="text-[9px] text-slate-500 mt-2 text-right">
+          เมื่อสักครู่
+        </div>
+      </div>
+
+      <!-- Likes & Cheer Button -->
+      <div class="flex items-center justify-between">
+        <div class="text-xs text-slate-400 flex items-center space-x-1">
+          <i class="fa-solid fa-heart text-pink-500"></i>
+          <span id="detailLikeCount" class="font-bold text-white">0</span>
+          <span>กำลังใจ</span>
+        </div>
+        <button id="sendCheerBtn" onclick="likeDetailItem()" class="px-4 py-2 bg-gradient-to-r from-pink-500 to-rose-600 hover:brightness-110 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md flex items-center space-x-1.5">
+          <i class="fa-solid fa-heart"></i>
+          <span>ส่งกำลังใจ ❤️</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 3: PARTICIPANTS DIRECTORY TABLE & CSV EXPORT        -->
+  <!-- ======================================================== -->
+  <div id="directoryModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-5">
+    <div class="bg-gradient-to-b from-[#0F172E] to-[#080D1D] w-full max-w-4xl h-[90vh] rounded-3xl border border-amber-500/30 p-4 sm:p-6 shadow-2xl flex flex-col justify-between">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div>
+          <h3 class="text-base sm:text-lg font-bold text-amber-400 glow-gold flex items-center space-x-2">
+            <i class="fa-solid fa-users"></i>
+            <span>รายชื่อผู้ร่วมลอยกระทง & ปล่อยโคมทั้งหมด</span>
+          </h3>
+          <p class="text-[11px] text-slate-400">ค้นหา ตรวจสอบคำอธิษฐาน และดาวน์โหลดรายชื่อเป็นไฟล์ CSV</p>
+        </div>
+        <button onclick="closeDirectoryModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Filter & Search Controls -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 my-3">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+          <input type="text" id="dirSearchInput" oninput="filterDirectoryTable()" placeholder="ค้นหาชื่อ หรือคำอธิษฐาน..." class="w-full bg-slate-800/90 text-xs pl-8 pr-3 py-2 rounded-xl border border-slate-700 text-white focus:outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <select id="dirDeptFilter" onchange="filterDirectoryTable()" class="w-full bg-slate-800/90 text-xs px-3 py-2 rounded-xl border border-slate-700 text-amber-200 focus:outline-none">
+            <option value="all">ทุกแผนกวิชา</option>
+          </select>
+        </div>
+        <div class="flex items-center space-x-2">
+          <select id="dirTypeFilter" onchange="filterDirectoryTable()" class="flex-1 bg-slate-800/90 text-xs px-3 py-2 rounded-xl border border-slate-700 text-white focus:outline-none">
+            <option value="all">ทั้งหมด (กระทง + โคม)</option>
+            <option value="krathong">เฉพาะกระทง</option>
+            <option value="lantern">เฉพาะโคมลอย</option>
+          </select>
+          <button onclick="exportParticipantsCSV()" title="Export CSV" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-2 rounded-xl font-bold flex items-center space-x-1 shadow">
+            <i class="fa-solid fa-file-csv text-sm"></i>
+            <span class="hidden sm:inline">Export</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Table Body Container -->
+      <div class="flex-1 overflow-y-auto rounded-2xl border border-slate-800 bg-slate-900/60 no-scrollbar">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-800/80 text-[11px] text-amber-300 sticky top-0 uppercase tracking-wider">
+            <tr>
+              <th class="py-2.5 px-3">รูป/อวตาร</th>
+              <th class="py-2.5 px-3">ประเภท</th>
+              <th class="py-2.5 px-3">ชื่อ - นามสกุล</th>
+              <th class="py-2.5 px-3">แผนกวิชา</th>
+              <th class="py-2.5 px-3">คำอธิษฐาน</th>
+              <th class="py-2.5 px-3 text-right">เวลา</th>
+            </tr>
+          </thead>
+          <tbody id="directoryTableBody" class="divide-y divide-slate-800">
+            <!-- Rows injected by renderDirectoryTable() -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Footer / Count Info -->
+      <div class="pt-3 flex items-center justify-between text-xs text-slate-400">
+        <div>
+          แสดง <span id="dirFilteredCount" class="font-bold text-amber-400">0</span> รายการ จากทั้งหมด <span id="dirTotalCount" class="font-bold text-white">0</span> รายการ
+        </div>
+        <button onclick="closeDirectoryModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs">
+          ปิดหน้าต่าง
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 4: ADMIN SETTINGS (PASSWORD: 1234)                 -->
+  <!-- ======================================================== -->
+  <div id="adminModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-gradient-to-b from-[#121B38] to-[#0A0E21] w-full max-w-md rounded-3xl border border-slate-700 p-5 shadow-2xl relative">
+      
+      <button onclick="closeAdminSettingsModal()" class="absolute top-4 right-4 w-7 h-7 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-xs">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Auth Section if locked -->
+      <div id="adminAuthSection" class="space-y-3 text-center py-4">
+        <div class="w-12 h-12 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto text-xl">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">เข้าสู่ระบบจัดการแอดมิน</h3>
+        <p class="text-xs text-slate-400">กรอกรหัสผ่านเพื่อแก้ไขข้อมูลสถาบันและระบบ API</p>
+        <input type="password" id="adminPasswordInput" placeholder="รหัสผ่าน (ค่าเริ่มต้น 1234)" class="w-full bg-slate-800 text-xs px-3 py-2 rounded-xl border border-slate-700 text-white text-center focus:outline-none focus:border-amber-400">
+        <button onclick="verifyAdminPassword()" class="w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs">
+          ยืนยันรหัสผ่าน
+        </button>
+      </div>
+
+      <!-- Config Form if unlocked -->
+      <div id="adminFormSection" class="hidden space-y-3">
+        <h3 class="text-sm font-bold text-amber-300 pb-1 border-b border-slate-800">
+          <i class="fa-solid fa-sliders mr-1"></i>ตั้งค่าระบบ (Admin Config)
+        </h3>
+        
+        <div>
+          <label class="block text-[11px] text-slate-300 mb-1">ชื่อสถาบันการศึกษา:</label>
+          <input type="text" id="cfgCollegeName" class="w-full bg-slate-800 text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-white">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[11px] text-slate-300 mb-1">ปี พ.ศ. งาน:</label>
+            <input type="text" id="cfgYear" class="w-full bg-slate-800 text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-white">
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-300 mb-1">รหัสผ่านแอดมินใหม่:</label>
+            <input type="password" id="cfgNewPassword" placeholder="เว้นว่างถ้าไม่เปลี่ยน" class="w-full bg-slate-800 text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-white">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] text-slate-300 mb-1">URL ของ Google Apps Script Web App:</label>
+          <input type="text" id="cfgGasUrl" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-slate-800 text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-amber-300">
+          <span class="text-[10px] text-slate-500">* หากเว้นว่าง ระบบจะจำลองข้อมูลและเก็บใน LocalStorage อัตโนมัติ</span>
+        </div>
+
+        <div>
+          <label class="block text-[11px] text-slate-300 mb-1">รายชื่อแผนกวิชา (คั่นด้วยจุลภาค ,):</label>
+          <textarea id="cfgDepartments" rows="3" class="w-full bg-slate-800 text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-white resize-none"></textarea>
+        </div>
+
+        <div class="flex items-center space-x-2 pt-2">
+          <button onclick="saveAdminSettings()" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs">
+            บันทึกการตั้งค่า
+          </button>
+          <button onclick="closeAdminSettingsModal()" class="py-2 px-3 bg-slate-800 text-slate-400 rounded-xl text-xs">
+            ปิด
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 5: DONATE & SUPPORT MODAL (SCB 4130745003)         -->
+  <!-- ======================================================== -->
+  <div id="donateModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-gradient-to-b from-[#14182D] to-[#0A0D1A] w-full max-w-xs rounded-3xl border border-pink-500/40 p-5 shadow-2xl relative text-center">
+      
+      <button onclick="closeDonateModal()" class="absolute top-3.5 right-3.5 w-7 h-7 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-xs">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="w-11 h-11 rounded-full bg-pink-500/20 text-pink-400 flex items-center justify-center mx-auto mb-2 text-xl">
+        <i class="fa-solid fa-heart"></i>
+      </div>
+
+      <h3 class="text-sm font-bold text-amber-300">สนับสนุนผู้พัฒนาเว็บแอป</h3>
+      <p class="text-[11px] text-slate-300 mt-1 mb-3">
+        ร่วมส่งเสริมกิจกรรมและการพัฒนานวัตกรรมของนักศึกษา แผนกวิชาเทคโนโลยีคอมพิวเตอร์ 68
+      </p>
+
+      <!-- Bank Card Details -->
+      <div class="bg-[#4E2A84] p-3.5 rounded-2xl border border-purple-400/40 text-left text-white shadow-md relative overflow-hidden mb-3">
+        <div class="flex items-center justify-between text-xs mb-2">
+          <span class="font-bold tracking-wide">ธนาคารไทยพาณิชย์ (SCB)</span>
+          <i class="fa-solid fa-building-columns opacity-80"></i>
+        </div>
+        <div class="text-[10px] text-purple-200">เลขที่บัญชี:</div>
+        <div class="text-base font-black tracking-wider text-yellow-300 my-0.5">
+          4130745003
+        </div>
+        <div class="text-[10px] text-purple-200">
+          ประเภท: ออมทรัพย์
+        </div>
+      </div>
+
+      <!-- Copy Button -->
+      <button onclick="copyToClipboard('4130745003')" class="w-full py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 active:scale-95 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow">
+        <i class="fa-solid fa-copy"></i>
+        <span>คัดลอกเลขบัญชี (SCB)</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- FLOATING TOAST NOTIFICATION                -->
+  <!-- ========================================== -->
+  <div id="toastNotification" class="fixed top-14 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white px-4 py-2 rounded-full border border-amber-500/50 shadow-2xl flex items-center space-x-2 text-xs z-50 pointer-events-none opacity-0 -translate-y-4">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+    <span id="toastMessage">ข้อความแจ้งเตือน</span>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT APPLICATION CODE                -->
+  <!-- ========================================== -->
+  <script>
+    /* ========================================================
+       1. GLOBAL CONFIGURATION & STATE
+       ======================================================== */
+    const DEFAULT_CONFIG = {
+      collegeName: "วิทยาลัยเทคนิคท่าหลวงซิเมนต์ไทยอนุสรณ์",
+      year: "๒๕๖๗",
+      adminPassword: "1234",
+      gasUrl: "", // Put Web App URL here or leave blank for LocalStorage fallback
+      departments: [
+        "ช่างเทคโนโลยีคอมพิวเตอร์",
+        "ช่างยนต์",
+        "ช่างไฟฟ้ากำลัง",
+        "ช่างอิเล็กทรอนิกส์",
+        "ช่างกลโรงงาน",
+        "ช่างเชื่อมโลหะ",
+        "ช่างก่อสร้าง",
+        "การบัญชี",
+        "การตลาด",
+        "คอมพิวเตอร์ธุรกิจ"
+      ]
+    };
+
+    let appConfig = JSON.parse(localStorage.getItem('loyKrathongConfig')) || DEFAULT_CONFIG;
+
+    // Current page tracking (0 = River, 1 = Esiimsi, 2 = Ramwong)
+    let currentPageIndex = 0;
+    const totalPages = 3;
+
+    // Items list (Stored locally and synced with GAS)
+    let itemsDatabase = JSON.parse(localStorage.getItem('loyKrathongItems')) || [];
+
+    // Counters
+    let cheerGarlandCount = parseInt(localStorage.getItem('cheerGarlands') || '18');
+    let cheerClapCount = parseInt(localStorage.getItem('cheerClaps') || '42');
+
+    // DIY Form State
+    let currentDiyType = 'krathong'; // 'krathong' | 'lantern'
+    let selectedAvatarIndex = 0;
+    let uploadedPhotoBase64 = null; // resized base64 dataURL
+
+    // Preset Wishes categorized
+    const PRESET_WISHES = {
+      khoma: [
+        "ข้าพเจ้าขอขมาพระแม่คงคา ที่ได้ทิ้งสิ่งปฏิกูลลงสู่สายน้ำ ขอโปรดอภัยและประทานความร่มเย็น",
+        "ขอขมาแม่คงคาด้วยกระทงนี้ ขอชำระล้างสิ่งไม่ดีและเคราะห์ร้ายให้ลอยลับไปกับสายน้ำ",
+        "กราบขอขมาพระแม่คงคา ขอให้ชีวิตราบรื่น มีแต่ความสุขกายสบายใจตลอดทั้งปี"
+      ],
+      study: [
+        "ขอให้โปรเจกต์คอมพิวเตอร์ผ่านฉลุย โค้ดไร้บั๊ก อาจารย์ตรวจรอบเดียวผ่าน!",
+        "ขอให้สอบเทอมนี้เกรด 4.00 ทุกรายวิชา ไม่ติด 0 ไม่ติด ร ไม่ติด มส.",
+        "ขอให้ฝึกงานอย่างราบรื่น ได้ประสบการณ์ดีๆ มีงานรองรับเงินเดือนสูงๆ"
+      ],
+      love: [
+        "ลอยกระทงปีนี้ ขอให้ได้เจอคนรู้ใจที่ท่าน้ำวิทยาลัย หรือขอให้รักกับคนปัจจุบันยืนยาว",
+        "กระทงหลงทางยังพอหาเจอ แต่ถ้าหลงเธอแล้วจะหาทางออกยังไง ขอให้สมหวังในรัก!",
+        "ลอยกระทงคนเดียวปีสุดท้าย ปีหน้าขอให้มีคนมาเดินจับมือลอยกระทงด้วยกันนะ"
+      ],
+      health: [
+        "ขอให้ครอบครัวและคนที่รักทุกคนมีสุขภาพร่างกายแข็งแรง ปราศจากโรคภัยไข้เจ็บ",
+        "ขอให้ปีนี้มีแต่ความโชคดี เงินทองไหลมาเทมา มีรอยยิ้มในทุกๆ วัน",
+        "ขอให้ชีวิตสงบสุข มีสติปัญญาแจ่มใส ปลอดภัยจากอันตรายทั้งปวง"
+      ]
+    };
+
+    // 20 Vocational Student Esiimsi Fortunes
+    const ESIIMSI_FORTUNES = [
+      {
+        num: 1,
+        title: "ใบที่ ๑: เบญจมงคลเริ่มต้นใหม่",
+        poem: "สายน้ำไหลหลั่งนำพาสิ่งดี เริ่มต้นสิ่งใดสำเร็จสมฤทัย",
+        study: "อ่านหนังสือจุดไหน ออกสอบจุดนั้น เกรดพุ่ง",
+        love: "คนโสดมีแววพบรักรุ่นพี่หรือเพื่อนร่วมแผนก",
+        luck: "มีลาภจากการจับฉลากหรือของฝากเพื่อน"
+      },
+      {
+        num: 2,
+        title: "ใบที่ ๒: ความเพียรย่อมชนะ",
+        poem: "งานหนักไม่เคยฆ่าใคร ขยันเข้าไว้ความสำเร็จรออยู่",
+        study: "ส่งงานอาจารย์ครบตามนัด ได้คะแนนเก็บเต็ม",
+        love: "อย่าเพิ่งใจร้อน ค่อยๆ ศึกษาดูใจกันไปก่อน",
+        luck: "โชคลาภปานกลาง ให้ระวังทำปากกาคู่ใจหล่นหาย"
+      },
+      {
+        num: 3,
+        title: "ใบที่ ๓: ฟ้าหลังฝนงดงาม",
+        poem: "ปัญหาที่ติดขัดจะคลี่คลาย ผู้ใหญ่เมตตาช่วยเหลือ",
+        study: "วิชาคำนวณที่ว่ายาก จะเข้าใจและสอบผ่าน",
+        love: "คนที่เข้าใจผิดจะกลับมาคุยกันดีเหมือนเดิม",
+        luck: "มีคนเลี้ยงชานมไข่มุกหรือของกินอร่อย"
+      },
+      {
+        num: 4,
+        title: "ใบที่ ๔: มิตรแท้ร่วมสู้",
+        poem: "เพื่อนดีพาเจริญ จับมือร่วมสร้างผลงาน",
+        study: "จับกลุ่มทำโปรเจกต์ราบรื่น เพื่อนช่วยกันคนละไม้ละมือ",
+        love: "เพื่อนสนิทอาจคิดเกินเพื่อน สังเกตสายตาดูดีๆ",
+        luck: "เลขห้องเรียนหรือรหัสวิชาอาจนำโชคดีมาให้"
+      },
+      {
+        num: 5,
+        title: "ใบที่ ๕: บารมีช่างกลหนุนนำ",
+        poem: "ฝีมือแม่นยำดั่งจับวาง สมาธิดีไม่มีพลาด",
+        study: "สอบภาคปฏิบัติคะแนนท็อป อาจารย์เอ่ยปากชม",
+        love: "เสน่ห์แรง มีคนแอบมองตอนเข้าช็อปปฏิบัติงาน",
+        luck: "ได้รับข่าวดีเรื่องเงินกู้ กยศ. หรือทุนการศึกษา"
+      },
+      {
+        num: 6,
+        title: "ใบที่ ๖: ดวงรักผลิบานริมน้ำ",
+        poem: "คืนเพ็ญเดือนสิบสอง หัวใจมีผู้จับจอง",
+        study: "การเรียนเรื่อยๆ ไม่หวือหวาแต่ปลอดภัย",
+        love: "คนที่แอบส่งสติ๊กเกอร์ให้ มีใจตรงกันแน่นอน",
+        luck: "ลาภลอยจากการเดินทางท่องเที่ยว"
+      },
+      {
+        num: 7,
+        title: "ใบที่ ๗: โค้ดผ่านฉลุย ไร้บั๊ก",
+        poem: "นิ้วสัมผัสคีย์บอร์ด พลังสมองแล่นปรื๊ด",
+        study: "เขียนโปรแกรมคอมไพล์รอบเดียวผ่าน ไม่มี Error กวนใจ",
+        love: "ความสัมพันธ์นิ่งสนิทเหมือนเซิร์ฟเวอร์เสถียร",
+        luck: "ได้อุปกรณ์ไอทีใหม่ หรือสายชาร์จไม่พังง่าย"
+      },
+      {
+        num: 8,
+        title: "ใบที่ ๘: สายชิลล์แต่เอาอยู่",
+        poem: "อย่ากังวลจนเกินเหตุ วางแผนให้ดีทุกอย่างผ่านได้",
+        study: "ติวหนังสือคืนเดียวแต่จำแม่น สอบผ่านสบาย",
+        love: "มีคนคุยแก้เหงา แต่อย่าเพิ่งรีบเปิดตัว",
+        luck: "เดินไปไหนก็เจอที่จอดรถมอเตอร์ไซค์ว่าง"
+      },
+      {
+        num: 9,
+        title: "ใบที่ ๙: เกรดสี่อยู่ไม่ไกล",
+        poem: "ดาวรุ่งพุ่งแรง อนาคตสดใสเกินใคร",
+        study: "ผลการเรียนเทอมนี้มีสิทธิ์ได้เกียรตินิยม",
+        love: "คนรักคอยซัพพอร์ต ช่วยกันติวช่วยกันเรียน",
+        luck: "มีโชคทางการเงิน ได้เงินคืนจากเพื่อนที่ยืมไป"
+      },
+      {
+        num: 10,
+        title: "ใบที่ ๑๐: ระวังงานด่วนงานงอก",
+        poem: "อย่าดองงานไว้วันสุดท้าย จะกลายเป็นดินพอกหางหมู",
+        study: "รีบเคลียร์ใบงานและสมุดการบ้านก่อนจะส่งไม่ทัน",
+        love: "ระวังเรื่องหึงหวงโดยใช่เหตุ เปิดใจคุยกัน",
+        luck: "งดเสี่ยงโชคช่วงนี้ เน้นประหยัดเก็บออมไว้กินของอร่อย"
+      },
+      {
+        num: 11,
+        title: "ใบที่ ๑๑: ดวงเสน่ห์จับใจ",
+        poem: "หน้าตาผ่องใส ใครเห็นใครก็รักและเอ็นดู",
+        study: "อาจารย์ให้คะแนนจิตพิสัยเต็มร้อย",
+        love: "มีรุ่นน้องต่างแผนกทักแชตมาคุยแก้เหงา",
+        luck: "ได้ของแถมเวลาไปซื้อข้าวโรงอาหาร"
+      },
+      {
+        num: 12,
+        title: "ใบที่ ๑๒: ไฟฟ้าสว่างไสว",
+        poem: "ประกายไฟแห่งปัญญา ส่องสว่างทางข้างหน้า",
+        study: "ไอเดียทำโครงงานสิ่งประดิษฐ์ได้รับเลือกไปแข่ง",
+        love: "หัวใจเต้นแรงเหมือนไฟช็อตเมื่อสบตากับคนน่ารัก",
+        luck: "มีดวงได้รับรางวัลจากการร่วมกิจกรรมวิทยาลัย"
+      },
+      {
+        num: 13,
+        title: "ใบที่ ๑๓: สุขภาพแข็งแรง",
+        poem: "ร่างกายแข็งแกร่ง พลังกายพร้อมลุยทุกสถานการณ์",
+        study: "เรียนหนักแต่ไม่ง่วง เข้าแถวทันเพลงชาติตลอด",
+        love: "ความรักสดชื่น สบายใจเหมือนได้กินน้ำเก๊กฮวยเย็นๆ",
+        luck: "แคล้วคลาดปลอดภัยทุกการเดินทาง"
+      },
+      {
+        num: 14,
+        title: "ใบที่ ๑๔: พบคู่แท้ท่าน้ำท่าหลวง",
+        poem: "โชคชะตาพามาพบ ณ ท่าน้ำริมสายชล",
+        study: "มีคนช่วยถือของ ช่วยจดเลกเชอร์ให้",
+        love: "มีเกณฑ์พบคนรู้ใจที่มีรสนิยมคล้ายกันในงานเทศกาล",
+        luck: "โชคดีสองเด้ง ทั้งเรื่องเพื่อนและครอบครัว"
+      },
+      {
+        num: 15,
+        title: "ใบที่ ๑๕: นักสร้างสรรค์มือทอง",
+        poem: "หยิบจับทำสิ่งใดก็งดงาม ปราณีตไร้ที่ติ",
+        study: "ชิ้นงานส่งประกวดได้ขึ้นบอร์ดหน้าแผนก",
+        love: "คนรักประทับใจในความใส่ใจดูแล",
+        luck: "มีลาภปาก ได้กินหมูกระทะฟรีมีคนเลี้ยง"
+      },
+      {
+        num: 16,
+        title: "ใบที่ ๑๖: บุญกุศลหนุนชะตา",
+        poem: "ปล่อยทุกข์ลอยไปตามน้ำ รับสิ่งมงคลเข้าสู่ชีวิต",
+        study: "ปัญหาความขัดแย้งในห้องเรียนยุติด้วยดี",
+        love: "เข้าใจซึ่งกันและกันมากขึ้น",
+        luck: "พบเจอสิ่งของที่เคยทำหล่นหายไปนาน"
+      },
+      {
+        num: 17,
+        title: "ใบที่ ๑๗: ดวงผู้นำโดดเด่น",
+        poem: "พูดจามีน้ำหนัก เพื่อนพ้องให้ความเคารพ",
+        study: "ได้รับเลือกเป็นหัวหน้ากลุ่มหรือตัวแทนห้อง",
+        love: "เป็นที่พึ่งพาให้คนที่ชอบได้ดีมาก",
+        luck: "การเจรจาต่อรองเรื่องเงินหรืองานสำเร็จลุล่วง"
+      },
+      {
+        num: 18,
+        title: "ใบที่ ๑๘: ก้าวกระโดดสู่อนาคต",
+        poem: "ฝึกปรือฝีมือวันนี้ พรุ่งนี้คือนายช่างผู้ชำนาญ",
+        study: "ทักษะวิชาชีพก้าวหน้าเร็วกว่าเพื่อนร่วมรุ่น",
+        love: "มีคนแอบส่งกำลังใจให้เงียบๆ ไม่เปิดเผยตัว",
+        luck: "มีโชคเกี่ยวกับตัวเลขทะเบียนรถหรือเลขห้อง"
+      },
+      {
+        num: 19,
+        title: "ใบที่ ๑๙: รอยยิ้มพิมพ์ใจ",
+        poem: "มองโลกในแง่ดี ชีวีมีแต่ความสุขสำราญ",
+        study: "บรรยากาศการเรียนสนุกสนาน ไม่เครียด",
+        love: "คนรักชวนไปเที่ยวงานวัด หาของกินอร่อยๆ ร่วมกัน",
+        luck: "สุ่มได้ของรางวัลชิ้นใหญ่ในงานรื่นเริง"
+      },
+      {
+        num: 20,
+        title: "ใบที่ ๒๐: มหาลาภศิษย์ท่าหลวง",
+        poem: "เกียรติภูมิวิทยาลัยนำพา ความเจริญก้าวหน้าสู่ตน",
+        study: "สำเร็จการศึกษาด้วยความภาคภูมิใจ มีงานทำทันที",
+        love: "รักลงตัว มีความสุขกับชีวิตปัจจุบัน",
+        luck: "ดวงการเงินดีเด่น มีรายได้พิเศษเข้ามาไม่ขาดสาย"
+      }
+    ];
+
+    /* ========================================================
+       2. SVG AVATARS GENERATION
+       ======================================================== */
+    const AVATARS_SVG = [
+      // 0: Boy student glasses
+      `<svg viewBox="0 0 80 80" class="w-full h-full">
+        <circle cx="40" cy="40" r="38" fill="#FDE68A"/>
+        <circle cx="40" cy="44" r="24" fill="#FED7AA"/>
+        <!-- Hair -->
+        <path d="M18,36 C18,20 32,14 40,14 C48,14 62,20 62,36 C55,26 48,24 40,24 C32,24 25,26 18,36 Z" fill="#1E293B"/>
+        <!-- Glasses -->
+        <circle cx="32" cy="42" r="7" fill="none" stroke="#0F172A" stroke-width="2.5"/>
+        <circle cx="48" cy="42" r="7" fill="none" stroke="#0F172A" stroke-width="2.5"/>
+        <line x1="39" y1="42" x2="41" y2="42" stroke="#0F172A" stroke-width="2.5"/>
+        <circle cx="32" cy="42" r="2.5" fill="#0F172A"/>
+        <circle cx="48" cy="42" r="2.5" fill="#0F172A"/>
+        <!-- Smile -->
+        <path d="M34,54 Q40,60 46,54" stroke="#DC2626" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- Cheeks -->
+        <circle cx="24" cy="48" r="4" fill="#F87171" opacity="0.5"/>
+        <circle cx="56" cy="48" r="4" fill="#F87171" opacity="0.5"/>
+      </svg>`,
+      // 1: Girl student ribbon
+      `<svg viewBox="0 0 80 80" class="w-full h-full">
+        <circle cx="40" cy="40" r="38" fill="#FBCFE8"/>
+        <circle cx="40" cy="44" r="24" fill="#FED7AA"/>
+        <!-- Hair -->
+        <path d="M16,42 C16,18 64,18 64,42 C56,26 48,22 40,22 C32,22 24,26 16,42 Z" fill="#471407"/>
+        <path d="M16,40 Q12,58 20,62 M64,40 Q68,58 60,62" stroke="#471407" stroke-width="6" stroke-linecap="round"/>
+        <!-- Ribbon -->
+        <circle cx="22" cy="22" r="6" fill="#EC4899"/>
+        <!-- Eyes -->
+        <circle cx="33" cy="42" r="3" fill="#0F172A"/>
+        <circle cx="47" cy="42" r="3" fill="#0F172A"/>
+        <circle cx="34" cy="40.5" r="1" fill="#FFFFFF"/>
+        <circle cx="48" cy="40.5" r="1" fill="#FFFFFF"/>
+        <!-- Smile -->
+        <path d="M35,53 Q40,58 45,53" stroke="#DB2777" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- Cheeks -->
+        <circle cx="26" cy="47" r="4" fill="#FB7185" opacity="0.6"/>
+        <circle cx="54" cy="47" r="4" fill="#FB7185" opacity="0.6"/>
+      </svg>`,
+      // 2: Vocational Mechanic boy with headband
+      `<svg viewBox="0 0 80 80" class="w-full h-full">
+        <circle cx="40" cy="40" r="38" fill="#BAE6FD"/>
+        <circle cx="40" cy="44" r="24" fill="#FDBA74"/>
+        <!-- Spiky Hair -->
+        <polygon points="20,32 30,12 40,24 50,12 60,32" fill="#1E1B4B"/>
+        <!-- Headband -->
+        <rect x="18" y="28" width="44" height="7" rx="3" fill="#EF4444"/>
+        <!-- Eyes -->
+        <circle cx="33" cy="44" r="3" fill="#0F172A"/>
+        <circle cx="47" cy="44" r="3" fill="#0F172A"/>
+        <!-- Cool smile -->
+        <path d="M35,54 Q42,57 47,52" stroke="#991B1B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- Wrench icon sticker on face -->
+        <circle cx="25" cy="48" r="3.5" fill="#38BDF8" opacity="0.5"/>
+      </svg>`,
+      // 3: Smart Computer Tech Girl with headset
+      `<svg viewBox="0 0 80 80" class="w-full h-full">
+        <circle cx="40" cy="40" r="38" fill="#DDD6FE"/>
+        <circle cx="40" cy="44" r="24" fill="#FED7AA"/>
+        <!-- Short Bob Hair -->
+        <path d="M18,36 C18,20 62,20 62,36 L64,52 L56,50 L56,34 L24,34 L24,50 L16,52 Z" fill="#312E81"/>
+        <!-- Headset -->
+        <path d="M16,40 Q40,16 64,40" stroke="#10B981" stroke-width="3" fill="none"/>
+        <rect x="14" y="38" width="6" height="12" rx="3" fill="#10B981"/>
+        <rect x="60" y="38" width="6" height="12" rx="3" fill="#10B981"/>
+        <!-- Eyes -->
+        <circle cx="33" cy="43" r="3" fill="#0F172A"/>
+        <circle cx="47" cy="43" r="3" fill="#0F172A"/>
+        <!-- Smile -->
+        <path d="M35,53 Q40,58 45,53" stroke="#4F46E5" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </svg>`,
+      // 4: Cute Thai Costume Boy (Traditional Chon Kben)
+      `<svg viewBox="0 0 80 80" class="w-full h-full">
+        <circle cx="40" cy="40" r="38" fill="#FEF08A"/>
+        <circle cx="40" cy="44" r="24" fill="#FED7AA"/>
+        <!-- Topknot hair with gold ring -->
+        <ellipse cx="40" cy="18" rx="8" ry="7" fill="#1C1917"/>
+        <ellipse cx="40" cy="23" rx="10" ry="3" fill="#F59E0B"/>
+        <!-- Hair fringe -->
+        <path d="M22,34 Q40,24 58,34" stroke="#1C1917" stroke-width="4" fill="none"/>
+        <!-- Eyes -->
+        <circle cx="33" cy="43" r="3" fill="#0F172A"/>
+        <circle cx="47" cy="43" r="3" fill="#0F172A"/>
+        <circle cx="34" cy="41.5" r="1" fill="#FFFFFF"/>
+        <circle cx="48" cy="41.5" r="1" fill="#FFFFFF"/>
+        <!-- Smile -->
+        <path d="M35,53 Q40,59 45,53" stroke="#B45309" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <circle cx="24" cy="48" r="4" fill="#F472B6" opacity="0.6"/>
+        <circle cx="56" cy="48" r="4" fill="#F472B6" opacity="0.6"/>
+      </svg>`,
+      // 5: Cute Thai Chut Thai Girl with Jasmine Garland
+      `<svg viewBox="0 0 80 80" class="w-full h-full">
+        <circle cx="40" cy="40" r="38" fill="#BBF7D0"/>
+        <circle cx="40" cy="44" r="24" fill="#FED7AA"/>
+        <!-- Sleek Hair bun on side with flower -->
+        <circle cx="54" cy="26" r="10" fill="#18181B"/>
+        <circle cx="54" cy="26" r="5" fill="#FDE047"/>
+        <path d="M20,38 C20,22 56,22 56,38" fill="#18181B"/>
+        <!-- Eyes -->
+        <circle cx="32" cy="43" r="3" fill="#0F172A"/>
+        <circle cx="46" cy="43" r="3" fill="#0F172A"/>
+        <!-- Dimple Smile -->
+        <path d="M34,53 Q39,58 44,53" stroke="#BE185D" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- Cheeks -->
+        <circle cx="24" cy="48" r="4" fill="#FB7185" opacity="0.6"/>
+        <circle cx="52" cy="48" r="4" fill="#FB7185" opacity="0.6"/>
+      </svg>`
+    ];
+
+    /* ========================================================
+       3. WEB AUDIO API SYNTHESIZER (No external audio needed!)
+       ======================================================== */
+    let audioCtx = null;
+    let isBgmPlaying = false;
+    let bgmIntervalId = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    // Bamboo Cup Shake Sound Generator (Web Audio white noise bursts)
+    function playBambooShakeSound() {
+      try {
+        const ctx = getAudioContext();
+        for (let i = 0; i < 4; i++) {
+          setTimeout(() => {
+            const bufferSize = ctx.sampleRate * 0.08;
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let j = 0; j < bufferSize; j++) {
+              data[j] = (Math.random() * 2 - 1) * Math.exp(-j / (bufferSize * 0.3));
+            }
+            const noise = ctx.createBufferSource();
+            noise.buffer = buffer;
+
+            // Bandpass filter to simulate hollow bamboo resonance
+            const filter = ctx.createBiquadFilter();
+            filter.type = "bandpass";
+            filter.frequency.value = 1400 + (Math.random() * 600 - 300);
+            filter.Q.value = 4.0;
+
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.35, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(ctx.destination);
+            noise.start();
+          }, i * 70);
+        }
+      } catch (e) {
+        console.warn("Audio not supported or blocked", e);
+      }
+    }
+
+    // Stick drop sound
+    function playStickDropSound() {
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(520, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.16);
+      } catch (e) {}
+    }
+
+    // Fireworks celebratory sound
+    function playFireworksSound() {
+      try {
+        const ctx = getAudioContext();
+        // Sub-bass boom
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(150, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.4);
+        gain.gain.setValueAtTime(0.6, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.45);
+
+        // Crackle sparkles
+        setTimeout(() => {
+          for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+              const bSize = ctx.sampleRate * 0.04;
+              const buf = ctx.createBuffer(1, bSize, ctx.sampleRate);
+              const d = buf.getChannelData(0);
+              for (let j = 0; j < bSize; j++) d[j] = Math.random() * 2 - 1;
+              const n = ctx.createBufferSource();
+              n.buffer = buf;
+              const g = ctx.createGain();
+              g.gain.setValueAtTime(0.2, ctx.currentTime);
+              g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.04);
+              n.connect(g);
+              g.connect(ctx.destination);
+              n.start();
+            }, i * 45);
+          }
+        }, 100);
+      } catch (e) {}
+    }
+
+    // Thai Traditional Ramwong Melody Synthesizer (Pentatonic scale: F, G, A, C, D)
+    const RAMWONG_NOTES = [
+      349.23, // F4
+      392.00, // G4
+      440.00, // A4
+      523.25, // C5
+      587.33, // D5
+      698.46, // F5
+      880.00  // A5
+    ];
+    // Traditional Loy Krathong motif rhythm sequence
+    const MELODY_SEQUENCE = [
+      3, 3, 2, 1,  3, 4, 3, 2,  1, 2, 3, 1,  2, 0, 1, 2,
+      3, 4, 5, 4,  3, 2, 3, 1,  2, 3, 4, 3,  2, 1, 0, 1
+    ];
+    let melodyStep = 0;
+
+    function playSynthNote(freq, duration = 0.22, type = 'sine') {
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+        // Soft bell/marimba like envelope
+        gain.gain.setValueAtTime(0.001, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration + 0.05);
+      } catch (e) {}
+    }
+
+    // Drum beat (Ching & Glong Ramwong)
+    function playRamwongPercussion(beat) {
+      try {
+        const ctx = getAudioContext();
+        if (beat % 2 === 0) {
+          // Glong (Bass tom)
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(110, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(45, ctx.currentTime + 0.12);
+          gain.gain.setValueAtTime(0.25, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.13);
+        } else {
+          // Ching (High chime)
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(1480, ctx.currentTime);
+          gain.gain.setValueAtTime(0.12, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.26);
+        }
+      } catch (e) {}
+    }
+
+    function toggleBGM() {
+      const btn = document.getElementById('bgmToggleBtn');
+      const icon = document.getElementById('bgmIcon');
+      if (isBgmPlaying) {
+        clearInterval(bgmIntervalId);
+        isBgmPlaying = false;
+        icon.className = 'fa-solid fa-volume-xmark';
+        btn.classList.remove('bg-amber-500', 'text-slate-950');
+        btn.classList.add('text-amber-400');
+        showToast("ปิดเสียงเพลงบรรเลงแล้ว", "info");
+      } else {
+        getAudioContext();
+        isBgmPlaying = true;
+        icon.className = 'fa-solid fa-music animate-bounce';
+        btn.classList.add('bg-amber-500', 'text-slate-950');
+        btn.classList.remove('text-amber-400');
+        showToast("กำลังเล่นดนตรีไทยบรรเลงรำวง", "success");
+
+        bgmIntervalId = setInterval(() => {
+          const noteIndex = MELODY_SEQUENCE[melodyStep % MELODY_SEQUENCE.length];
+          const freq = RAMWONG_NOTES[noteIndex];
+          playSynthNote(freq, 0.25, 'triangle');
+          playRamwongPercussion(melodyStep);
+          melodyStep++;
+        }, 280);
+      }
+    }
+
+    /* ========================================================
+       4. SWIPEABLE NAVIGATION (TOUCH & DESKTOP)
+       ======================================================== */
+    const swipeContainer = document.getElementById('swipeContainer');
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    function switchPage(index) {
+      if (index < 0 || index >= totalPages) return;
+      currentPageIndex = index;
+      swipeContainer.style.transform = `translateX(-${index * (100 / totalPages)}%)`;
+
+      // Update Header Tab state
+      for (let i = 0; i < totalPages; i++) {
+        const tabBtn = document.getElementById(`tab-btn-${i}`);
+        const mobBtn = document.getElementById(`mob-btn-${i}`);
+        if (i === index) {
+          if (tabBtn) {
+            tabBtn.className = "px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 flex items-center space-x-1.5 bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30";
+          }
+          if (mobBtn) {
+            mobBtn.className = "flex flex-col items-center text-amber-400 font-bold";
+          }
+        } else {
+          if (tabBtn) {
+            tabBtn.className = "px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 flex items-center space-x-1.5 text-slate-300 hover:text-amber-300";
+          }
+          if (mobBtn) {
+            mobBtn.className = "flex flex-col items-center text-slate-400";
+          }
+        }
+      }
+
+      // If switching to stage, re-trigger dancer render
+      if (index === 2) {
+        renderStageDancers();
+      }
+    }
+
+    function prevPage() {
+      if (currentPageIndex > 0) switchPage(currentPageIndex - 1);
+    }
+    function nextPage() {
+      if (currentPageIndex < totalPages - 1) switchPage(currentPageIndex + 1);
+    }
+
+    // Touch Swipe Event Listeners
+    const swipeViewport = document.getElementById('swipeViewport');
+    swipeViewport.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    swipeViewport.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleGesture();
+    }, { passive: true });
+
+    function handleGesture() {
+      const deltaX = touchEndX - touchStartX;
+      const minSwipeDistance = 50;
+      if (Math.abs(deltaX) > minSwipeDistance) {
+        if (deltaX < 0) {
+          nextPage(); // Swiped left -> Next page
+        } else {
+          prevPage(); // Swiped right -> Previous page
+        }
+      }
+    }
+
+    /* ========================================================
+       5. RIVER CANVAS & PARTICLES (PAGE 1)
+       ======================================================== */
+    const riverCanvas = document.getElementById('riverCanvas');
+    const ctxRiver = riverCanvas.getContext('2d');
+    let canvasWidth, canvasHeight;
+    let waterRipples = [];
+    let skyStars = [];
+
+    function initCanvasDimensions() {
+      const p0 = document.getElementById('page-0');
+      canvasWidth = riverCanvas.width = p0.clientWidth;
+      canvasHeight = riverCanvas.height = p0.clientHeight;
+
+      // Init Stars
+      skyStars = [];
+      for (let i = 0; i < 60; i++) {
+        skyStars.push({
+          x: Math.random() * canvasWidth,
+          y: Math.random() * (canvasHeight * 0.55),
+          r: Math.random() * 1.5 + 0.5,
+          alpha: Math.random() * 0.8 + 0.2,
+          speed: Math.random() * 0.02 + 0.01
+        });
+      }
+
+      // Init Ripples
+      waterRipples = [];
+      for (let i = 0; i < 15; i++) {
+        waterRipples.push({
+          x: Math.random() * canvasWidth,
+          y: canvasHeight * 0.65 + Math.random() * (canvasHeight * 0.35),
+          w: Math.random() * 40 + 20,
+          speed: Math.random() * 0.6 + 0.3,
+          alpha: Math.random() * 0.4 + 0.2
+        });
+      }
+    }
+
+    function animateRiverCanvas() {
+      ctxRiver.clearRect(0, 0, canvasWidth, canvasHeight);
+
+      // Draw Twinkling Stars
+      for (let s of skyStars) {
+        s.alpha += s.speed;
+        if (s.alpha > 1 || s.alpha < 0.2) s.speed = -s.speed;
+        ctxRiver.beginPath();
+        ctxRiver.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctxRiver.fillStyle = `rgba(255, 255, 255, ${Math.max(0, s.alpha)})`;
+        ctxRiver.fill();
+      }
+
+      // Draw Water Light Ripples
+      for (let r of waterRipples) {
+        r.x -= r.speed;
+        if (r.x < -r.w) {
+          r.x = canvasWidth + r.w;
+          r.y = canvasHeight * 0.65 + Math.random() * (canvasHeight * 0.35);
+        }
+        ctxRiver.beginPath();
+        ctxRiver.ellipse(r.x, r.y, r.w, 2, 0, 0, Math.PI * 2);
+        ctxRiver.fillStyle = `rgba(245, 158, 11, ${r.alpha * 0.25})`;
+        ctxRiver.fill();
+      }
+
+      requestAnimationFrame(animateRiverCanvas);
+    }
+
+    function changeRiverScene(theme) {
+      const backdropSky = document.getElementById('backdropSky');
+      const scenery = document.getElementById('backdropScenery');
+      const fullMoon = document.getElementById('fullMoon');
+
+      if (theme === 'campus') {
+        backdropSky.className = "absolute inset-0 bg-gradient-to-b from-[#1E1B4B] via-[#1E3A8A] via-[#1D4ED8]/45 to-[#0284C7]/85";
+        scenery.style.opacity = '0.8';
+        fullMoon.style.display = 'block';
+      } else if (theme === 'moon') {
+        backdropSky.className = "absolute inset-0 bg-gradient-to-b from-[#0F172A] via-[#1E293B] via-[#1E3A8A]/80 to-[#0284C7]";
+        scenery.style.opacity = '0.5';
+        fullMoon.style.display = 'block';
+        fullMoon.style.transform = 'scale(1.25)';
+      } else if (theme === 'temple') {
+        backdropSky.className = "absolute inset-0 bg-gradient-to-b from-[#581C87] via-[#7E22CE] via-[#2563EB]/50 to-[#0284C7]/90";
+        scenery.style.opacity = '0.95';
+        fullMoon.style.display = 'block';
+      }
+      showToast(`เปลี่ยนฉากเป็น: ${document.querySelector(`#bgThemeSelect option[value="${theme}"]`).textContent}`, 'info');
+    }
+
+    /* ========================================================
+       BOT KRATHONGS & LANTERNS DATA (BACKGROUND PARTICIPANTS)
+       ======================================================== */
+    const BOT_ITEMS = [
+      {
+        id: 'BOT_1',
+        type: 'krathong',
+        fullName: 'อ.พงษ์ศักดิ์ (หน.แผนกคอมฯ)',
+        department: 'เทคโนโลยีคอมพิวเตอร์',
+        isBot: true,
+        avatar: 0,
+        wish: 'ขอให้ลูกศิษย์ทุกคนเกรด 4.00 ได้งานทำเงินเดือนสูงๆ ทุกคน!',
+        likes: 68,
+        designConfig: { base: 'lotus', flowers: 'marigold', candle: 'gold', frameStyle: 'flower' }
+      },
+      {
+        id: 'BOT_2',
+        type: 'krathong',
+        fullName: 'พี่เบิร์ด ช่างยนต์ 67',
+        department: 'ช่างยนต์',
+        isBot: true,
+        avatar: 2,
+        wish: 'ขอให้เครื่องยนต์แรง ซ่อมรอบเดียวจบ ไม่มีสะดุด ปลอดภัยทุกทริป!',
+        likes: 42,
+        designConfig: { base: 'banana', flowers: 'orchid', candle: 'red', frameStyle: 'circle' }
+      },
+      {
+        id: 'BOT_3',
+        type: 'lantern',
+        fullName: 'น้องฟ้าใส (ปี 1 คอมฯ)',
+        department: 'เทคโนโลยีคอมพิวเตอร์',
+        isBot: true,
+        avatar: 1,
+        wish: 'ขอให้โค้ดรันผ่านฉลุย โปรเจกต์ผ่านรอบเดียวไม่มีบั๊กกวนใจ!',
+        likes: 54,
+        designConfig: { shape: 'traditional', color: '#EC4899', frameStyle: 'heart' }
+      },
+      {
+        id: 'BOT_4',
+        type: 'krathong',
+        fullName: 'ช่างไฟพลังช้าง',
+        department: 'ช่างไฟฟ้ากำลัง',
+        isBot: true,
+        avatar: 4,
+        wish: 'ขอให้ต่อวงจรผ่านฉลุย ไฟไม่ตัด ไม่ช็อต แคล้วคลาดปลอดภัย!',
+        likes: 35,
+        designConfig: { base: 'banana', flowers: 'jasmine', candle: 'gold', frameStyle: 'circle' }
+      },
+      {
+        id: 'BOT_5',
+        type: 'lantern',
+        fullName: 'น้องเนย การบัญชี',
+        department: 'การบัญชี',
+        isBot: true,
+        avatar: 3,
+        wish: 'ขอให้เดบิต เครดิต งบดุลลงตัวเป๊ะ ปิดยอดได้ทุกสิ้นเดือน!',
+        likes: 49,
+        designConfig: { shape: 'oval', color: '#FBBF24', frameStyle: 'heart' }
+      },
+      {
+        id: 'BOT_6',
+        type: 'krathong',
+        fullName: 'ทีมหุ่นยนต์กู้ภัย ท.ล.',
+        department: 'ช่างอิเล็กทรอนิกส์',
+        isBot: true,
+        avatar: 2,
+        wish: 'ขอให้คว้าแชมป์การแข่งขันทักษะวิชาชีพ นำชื่อเสียงสู่วิทยาลัยเทคนิคท่าหลวงฯ',
+        likes: 88,
+        designConfig: { base: 'ice', flowers: 'marigold', candle: 'red', frameStyle: 'flower' }
+      },
+      {
+        id: 'BOT_7',
+        type: 'krathong',
+        fullName: 'ช่างกลโรงงาน รุ่นเก๋า',
+        department: 'ช่างกลโรงงาน',
+        isBot: true,
+        avatar: 4,
+        wish: 'ขอให้งานกลึงมิลลิ่งเป๊ะตามแบบ ไม่เกินพิกัดความเผื่อ งานเนียนกริ๊บ!',
+        likes: 31,
+        designConfig: { base: 'bread', flowers: 'mixed', candle: 'gold', frameStyle: 'circle' }
+      },
+      {
+        id: 'BOT_8',
+        type: 'lantern',
+        fullName: 'สาวมั่นการตลาด',
+        department: 'การตลาด',
+        isBot: true,
+        avatar: 5,
+        wish: 'ขอให้ยอดขายปังๆ ลูกค้าทักแชตไม่หยุด ประสบความสำเร็จในชีวิต!',
+        likes: 39,
+        designConfig: { shape: 'star', color: '#A855F7', frameStyle: 'circle' }
+      },
+      {
+        id: 'BOT_9',
+        type: 'krathong',
+        fullName: 'นายช่างเชื่อมสายเท่',
+        department: 'ช่างเชื่อมโลหะ',
+        isBot: true,
+        avatar: 2,
+        wish: 'รอยเชื่อมเกล็ดปลาเนียนกริ๊บ ตรวจสอบรอยร้าว X-ray ผ่านฉลุย 100%',
+        likes: 27,
+        designConfig: { base: 'banana', flowers: 'marigold', candle: 'red', frameStyle: 'circle' }
+      },
+      {
+        id: 'BOT_10',
+        type: 'lantern',
+        fullName: 'น้องมุก คอมธุรกิจ',
+        department: 'คอมพิวเตอร์ธุรกิจ',
+        isBot: true,
+        avatar: 1,
+        wish: 'ลอยกระทงปีนี้ ขอให้ได้พบคนรู้ใจที่ท่าน้ำวิทยาลัยด้วยเถิดดด!',
+        likes: 63,
+        designConfig: { shape: 'traditional', color: '#38BDF8', frameStyle: 'heart' }
+      }
+    ];
+
+    /* ========================================================
+       6. FLOATING ITEMS RENDERER & INTERACTION (PAGE 1)
+       ======================================================== */
+    const floatingRiverItemsContainer = document.getElementById('floatingRiverItems');
+
+    function renderFloatingItems(newlyLaunchedId = null) {
+      floatingRiverItemsContainer.innerHTML = '';
+
+      // --- LAYER 1: Background Bot Krathongs & Lanterns ---
+      BOT_ITEMS.forEach((bot, bIndex) => {
+        const isKrathong = bot.type === 'krathong';
+        const botElem = document.createElement('div');
+        botElem.className = 'absolute cursor-pointer pointer-events-auto transform transition-transform hover:scale-110 active:scale-95 group z-10 opacity-85';
+
+        if (isKrathong) {
+          // River background depth: bottom 105px to 165px
+          const bottomPos = 105 + (bIndex * 24) % 65;
+          botElem.style.bottom = `${bottomPos}px`;
+          botElem.style.top = 'auto';
+          const duration = 22 + (bIndex % 3) * 4;
+          const delay = -(((bIndex * 5.8) + 1.5) % duration);
+          botElem.style.animation = `driftRiver ${duration}s linear ${delay}s infinite`;
+        } else {
+          // Sky background depth: top 6% to 32%
+          const topPos = 6 + (bIndex * 15) % 28;
+          botElem.style.top = `${topPos}%`;
+          botElem.style.bottom = 'auto';
+          const duration = 28 + (bIndex % 3) * 5;
+          const delay = -(((bIndex * 6.5) + 2) % duration);
+          botElem.style.animation = `driftSkyLantern ${duration}s linear ${delay}s infinite`;
+        }
+
+        botElem.style.left = '0px';
+
+        const frameClass = bot.designConfig?.frameStyle === 'heart' 
+          ? 'rounded-full border border-pink-400' 
+          : 'rounded-full border border-amber-400';
+
+        botElem.innerHTML = `
+          <div class="relative flex flex-col items-center transform scale-[0.82]">
+            <!-- Bot Wish Speech Bubble -->
+            <div class="mb-1 bg-slate-900/85 text-amber-200 text-[9px] px-2 py-0.5 rounded-full border border-amber-500/30 max-w-[115px] truncate opacity-90 group-hover:opacity-100 shadow">
+              ${escapeHtml(bot.wish)}
+            </div>
+
+            <!-- Avatar -->
+            <div class="relative -mb-2 z-10 w-8 h-8 ${frameClass} bg-slate-800 shadow-md overflow-hidden flex items-center justify-center">
+              ${AVATARS_SVG[bot.avatar || 0]}
+            </div>
+
+            <!-- Base Artwork -->
+            ${isKrathong ? getKrathongArtworkSVG(bot.designConfig) : getLanternArtworkSVG(bot.designConfig)}
+
+            <!-- Bot Badge Name (Background Ambient) -->
+            <div class="mt-0.5 bg-gradient-to-r from-indigo-950 via-purple-950 to-indigo-950 text-amber-300 text-[9px] font-bold px-2 py-0.5 rounded-full border border-amber-400/40 shadow flex items-center space-x-1 max-w-[120px] truncate">
+              <span class="text-[10px]">🤖</span>
+              <span>${escapeHtml(bot.fullName)}</span>
+            </div>
+            <div class="text-[8px] text-pink-300/80 font-medium">${escapeHtml(bot.department)}</div>
+          </div>
+        `;
+
+        botElem.onclick = (e) => {
+          e.stopPropagation();
+          openDetailModal(bot);
+        };
+
+        floatingRiverItemsContainer.appendChild(botElem);
+      });
+
+      // --- LAYER 2: Foreground User Krathongs & Lanterns ---
+      itemsDatabase.slice(0, 20).forEach((item, index) => {
+        const itemElem = document.createElement('div');
+        itemElem.className = 'absolute cursor-pointer pointer-events-auto transform transition-transform hover:scale-115 active:scale-95 group z-25';
+        
+        const isKrathong = item.type === 'krathong';
+        const isNewlyLaunched = (item.id === newlyLaunchedId);
+
+        // Position accurately in River or Sky
+        if (isKrathong) {
+          // Foreground river: bottom 65px to 145px (closer to viewer)
+          const bottomPos = 65 + (index * 20) % 75;
+          itemElem.style.bottom = `${bottomPos}px`;
+          itemElem.style.top = 'auto';
+        } else {
+          // Foreground sky: top 12% to 42%
+          const topPos = 12 + (index * 16) % 30;
+          itemElem.style.top = `${topPos}%`;
+          itemElem.style.bottom = 'auto';
+        }
+
+        itemElem.style.left = '0px';
+
+        // Animation configuration
+        if (isNewlyLaunched) {
+          if (isKrathong) {
+            itemElem.style.animation = 'newKrathongSpawn 26s ease-out forwards';
+          } else {
+            itemElem.style.animation = 'newLanternSpawn 26s ease-out forwards';
+          }
+        } else {
+          if (isKrathong) {
+            const duration = 18 + (index % 4) * 3;
+            const delay = -(((index * 5.2) + 2) % duration);
+            itemElem.style.animation = `driftRiver ${duration}s linear ${delay}s infinite`;
+          } else {
+            const duration = 24 + (index % 4) * 4;
+            const delay = -(((index * 6.1) + 3) % duration);
+            itemElem.style.animation = `driftSkyLantern ${duration}s linear ${delay}s infinite`;
+          }
+        }
+
+        // Attached photo or avatar
+        const photoOrAvatar = item.imageUrl 
+          ? `<img src="${item.imageUrl}" class="w-full h-full object-cover">`
+          : (AVATARS_SVG[item.avatar || 0] || '🪷');
+
+        const frameClass = item.designConfig?.frameStyle === 'heart' 
+          ? 'rounded-full border-2 border-pink-400' 
+          : 'rounded-full border-2 border-amber-400';
+
+        // Special highlight badge and ripple for newly launched item
+        const newBadge = isNewlyLaunched 
+          ? `<div class="mb-1 bg-gradient-to-r from-pink-500 via-rose-500 to-amber-400 text-white text-[10px] font-black px-3 py-0.5 rounded-full shadow-2xl border-2 border-white animate-bounce flex items-center space-x-1">
+               <span>✨</span><span>กระทงของคุณ ${escapeHtml(item.fullName)} (เพิ่งลอย)</span>
+             </div>`
+          : '';
+
+        const rippleElem = (isNewlyLaunched && isKrathong) 
+          ? `<div class="ripple-ring -bottom-1"></div>` 
+          : '';
+
+        itemElem.innerHTML = `
+          <div class="relative flex flex-col items-center">
+            ${newBadge}
+
+            <!-- Wish speech bubble above item -->
+            <div class="mb-1 bg-slate-900/95 text-amber-200 text-[10px] px-2.5 py-0.5 rounded-full border border-amber-400/60 shadow-lg whitespace-nowrap max-w-[140px] truncate opacity-95 group-hover:opacity-100 backdrop-blur-sm">
+              ${escapeHtml(item.wish || 'ขอขมาพระแม่คงคา')}
+            </div>
+
+            <!-- Attached User Photo Sticker -->
+            <div class="relative -mb-2 z-10 w-9 h-9 ${frameClass} bg-slate-800 shadow-xl overflow-hidden flex items-center justify-center">
+              ${photoOrAvatar}
+            </div>
+
+            <!-- Floating Object Base (Krathong or Lantern SVG) -->
+            ${isKrathong ? getKrathongArtworkSVG(item.designConfig) : getLanternArtworkSVG(item.designConfig)}
+
+            ${rippleElem}
+
+            <!-- Prominent User Name Badge -->
+            <div class="mt-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 text-slate-950 font-black text-[10px] sm:text-[11px] px-3 py-0.5 rounded-full border-2 border-white shadow-xl max-w-[135px] truncate flex items-center space-x-1">
+              <span class="text-xs">👤</span>
+              <span>${escapeHtml(item.fullName)}</span>
+            </div>
+            <!-- Department Tag -->
+            <div class="text-[9px] text-amber-200 font-semibold bg-slate-950/85 px-2 py-0.2 rounded-full border border-slate-700 max-w-[120px] truncate mt-0.5 shadow">
+              ${escapeHtml(item.department)}
+            </div>
+          </div>
+        `;
+
+        itemElem.onclick = (e) => {
+          e.stopPropagation();
+          openDetailModal(item);
+        };
+
+        floatingRiverItemsContainer.appendChild(itemElem);
+      });
+
+      updateStatsCounters();
+    }
+
+    function updateStatsCounters() {
+      const kCount = itemsDatabase.filter(i => i.type === 'krathong').length;
+      const lCount = itemsDatabase.filter(i => i.type === 'lantern').length;
+      document.getElementById('statKrathongCount').textContent = kCount;
+      document.getElementById('statLanternCount').textContent = lCount;
+    }
+
+    // Krathong SVG generator based on config
+    function getKrathongArtworkSVG(cfg = {}) {
+      const candleColor = cfg.candle === 'red' ? '#EF4444' : '#F59E0B';
+      const flowerColor = cfg.flowers === 'orchid' ? '#C084FC' : (cfg.flowers === 'jasmine' ? '#FFFFFF' : '#FBBF24');
+      const baseGrad = cfg.base === 'lotus' ? '#EC4899' : (cfg.base === 'ice' ? '#38BDF8' : '#15803D');
+
+      return `
+        <svg width="68" height="52" viewBox="0 0 100 80" class="filter drop-shadow-[0_4px_10px_rgba(245,158,11,0.6)]">
+          <!-- Candle Glow -->
+          <circle cx="50" cy="18" r="8" fill="${candleColor}" opacity="0.3" class="animate-pulse"/>
+          <!-- Flame -->
+          <path d="M50,12 Q53,18 50,22 Q47,18 50,12 Z" fill="#F59E0B"/>
+          <!-- Candle Sticks -->
+          <rect x="48" y="22" width="4" height="18" rx="1" fill="${candleColor}"/>
+          <line x1="44" y1="26" x2="44" y2="40" stroke="#78350F" stroke-width="2"/>
+          <line x1="56" y1="26" x2="56" y2="40" stroke="#78350F" stroke-width="2"/>
+          
+          <!-- Flowers -->
+          <circle cx="36" cy="42" r="7" fill="${flowerColor}"/>
+          <circle cx="64" cy="42" r="7" fill="${flowerColor}"/>
+          <circle cx="50" cy="42" r="8" fill="#FDE047"/>
+
+          <!-- Banana/Lotus Base -->
+          <path d="M10,55 Q50,75 90,55 Q75,78 50,78 Q25,78 10,55 Z" fill="${baseGrad}" stroke="#064E3B" stroke-width="2"/>
+          <path d="M15,50 Q30,68 50,68 Q70,68 85,50 Q50,62 15,50 Z" fill="${baseGrad}" opacity="0.85"/>
+        </svg>
+      `;
+    }
+
+    // Lantern SVG generator based on config
+    function getLanternArtworkSVG(cfg = {}) {
+      const color = cfg.color || '#FBBF24';
+      return `
+        <svg width="60" height="70" viewBox="0 0 100 120" class="filter drop-shadow-[0_0_15px_rgba(251,191,36,0.8)]">
+          <!-- Fire Core -->
+          <circle cx="50" cy="100" r="10" fill="#F59E0B" class="animate-pulse"/>
+          <!-- Lantern Body -->
+          <path d="M25,25 Q15,65 30,105 L70,105 Q85,65 75,25 Z" fill="${color}" opacity="0.9" stroke="#B45309" stroke-width="2"/>
+          <!-- Top & Bottom Rings -->
+          <ellipse cx="50" cy="25" rx="25" ry="6" fill="#78350F"/>
+          <ellipse cx="50" cy="105" rx="20" ry="5" fill="#78350F"/>
+          <!-- Inner Glow Light -->
+          <circle cx="50" cy="65" r="22" fill="#FEF3C7" opacity="0.75" class="animate-pulse-glow"/>
+        </svg>
+      `;
+    }
+
+    /* ========================================================
+       7. DIY MODAL, REAL-TIME PREVIEW & IMAGE RESIZING
+       ======================================================== */
+    function openDIYModal(type = 'krathong') {
+      currentDiyType = type;
+      document.getElementById('diyModal').classList.remove('hidden');
+      
+      const title = document.getElementById('diyModalTitle');
+      const step2Title = document.getElementById('diyStep2Title');
+      const submitText = document.getElementById('submitLaunchBtnText');
+      const kControls = document.getElementById('krathongCustomizerControls');
+      const lControls = document.getElementById('lanternCustomizerControls');
+
+      if (type === 'krathong') {
+        title.innerHTML = '🪷 ประดิษฐ์กระทงออนไลน์';
+        step2Title.textContent = 'ตกแต่งกระทง & รูปภาพติดกระทง';
+        submitText.textContent = 'ปล่อยกระทงลงสายน้ำ';
+        kControls.classList.remove('hidden');
+        lControls.classList.add('hidden');
+      } else {
+        title.innerHTML = '🏮 ปล่อยโคมลอยสู่ท้องฟ้า';
+        step2Title.textContent = 'ปรับแต่งโคมลอย & รูปภาพติดโคม';
+        submitText.textContent = 'ปล่อยโคมลอยขึ้นสู่ท้องฟ้า';
+        kControls.classList.add('hidden');
+        lControls.classList.remove('hidden');
+      }
+
+      renderAvatarSelector();
+      updateDiyItem();
+    }
+
+    function closeDIYModal() {
+      document.getElementById('diyModal').classList.add('hidden');
+    }
+
+    function renderAvatarSelector() {
+      const grid = document.getElementById('avatarSelectorGrid');
+      grid.innerHTML = '';
+      AVATARS_SVG.forEach((svg, idx) => {
+        const btn = document.createElement('div');
+        btn.className = `w-11 h-11 p-1 rounded-full cursor-pointer transition-all border-2 flex items-center justify-center ${
+          selectedAvatarIndex === idx ? 'border-amber-400 bg-amber-500/30 scale-105' : 'border-slate-700 bg-slate-800 hover:border-slate-500'
+        }`;
+        btn.innerHTML = svg;
+        btn.onclick = () => {
+          selectedAvatarIndex = idx;
+          renderAvatarSelector();
+          updateDiyItem();
+        };
+        grid.appendChild(btn);
+      });
+    }
+
+    function updateDiyItem() {
+      const container = document.getElementById('liveDiyPreview');
+      const name = document.getElementById('inputFullName').value.trim() || 'ชื่อของคุณ';
+      const frameStyle = document.querySelector('input[name="photoFrameStyle"]:checked')?.value || 'circle';
+
+      const photoContent = uploadedPhotoBase64 
+        ? `<img src="${uploadedPhotoBase64}" class="w-full h-full object-cover">`
+        : AVATARS_SVG[selectedAvatarIndex];
+
+      let frameBorder = 'border-2 border-amber-400 rounded-full';
+      if (frameStyle === 'heart') {
+        frameBorder = 'border-2 border-pink-400 rounded-full shadow-[0_0_10px_#ec4899]';
+      } else if (frameStyle === 'flower') {
+        frameBorder = 'border-2 border-yellow-300 rounded-full shadow-[0_0_10px_#fde047]';
+      }
+
+      const cfg = {
+        base: document.getElementById('selKrathongBase')?.value,
+        flowers: document.getElementById('selKrathongFlowers')?.value,
+        candle: document.getElementById('selKrathongCandle')?.value,
+        decor: document.getElementById('selKrathongDecor')?.value,
+        shape: document.getElementById('selLanternShape')?.value,
+        color: document.getElementById('selLanternColor')?.value,
+        pattern: document.getElementById('selLanternPattern')?.value,
+        frameStyle: frameStyle
+      };
+
+      const artwork = currentDiyType === 'krathong' 
+        ? getKrathongArtworkSVG(cfg) 
+        : getLanternArtworkSVG(cfg);
+
+      container.innerHTML = `
+        <div class="flex flex-col items-center animate-float-slow">
+          <!-- Attached photo preview mounted on top -->
+          <div class="relative -mb-4 z-20 w-16 h-16 ${frameBorder} bg-slate-900 overflow-hidden flex items-center justify-center">
+            ${photoContent}
+          </div>
+          <div class="transform scale-125 my-1">
+            ${artwork}
+          </div>
+          <div class="bg-slate-950/80 text-[11px] text-amber-300 font-semibold px-3 py-0.5 rounded-full border border-amber-500/40 shadow mt-1">
+            ${escapeHtml(name)}
+          </div>
+        </div>
+      `;
+    }
+
+    // Photo input handler with client-side compression & crop (250x250)
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 260;
+          canvas.width = maxDim;
+          canvas.height = maxDim;
+          const ctx = canvas.getContext('2d');
+
+          // Center crop square
+          const minSide = Math.min(img.width, img.height);
+          const sx = (img.width - minSide) / 2;
+          const sy = (img.height - minSide) / 2;
+
+          ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, maxDim, maxDim);
+          uploadedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.85);
+
+          showToast("อัปโหลดและปักรูปภาพบนกระทงเรียบร้อยแล้ว!", "success");
+          updateDiyItem();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function updateCharCount() {
+      const txt = document.getElementById('inputWish').value;
+      document.getElementById('charCounter').textContent = `${txt.length}/150`;
+    }
+
+    function pickPresetWish(cat) {
+      const list = PRESET_WISHES[cat] || PRESET_WISHES.khoma;
+      const randomWish = list[Math.floor(Math.random() * list.length)];
+      document.getElementById('inputWish').value = randomWish;
+      updateCharCount();
+    }
+
+    // Submit and launch into the river or sky
+    async function submitLaunchItem() {
+      const fullName = document.getElementById('inputFullName').value.trim();
+      const department = document.getElementById('selectDepartment').value;
+      const wish = document.getElementById('inputWish').value.trim() || "ขอขมาพระแม่คงคา และขอให้ครอบครัวมีความสุข";
+
+      if (!fullName) {
+        showToast("กรุณากรอกชื่อ-นามสกุลก่อนลอยกระทงครับ", "error");
+        document.getElementById('inputFullName').focus();
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitLaunchBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังส่งข้อมูล...`;
+
+      const frameStyle = document.querySelector('input[name="photoFrameStyle"]:checked')?.value || 'circle';
+      const designConfig = {
+        base: document.getElementById('selKrathongBase')?.value,
+        flowers: document.getElementById('selKrathongFlowers')?.value,
+        candle: document.getElementById('selKrathongCandle')?.value,
+        decor: document.getElementById('selKrathongDecor')?.value,
+        shape: document.getElementById('selLanternShape')?.value,
+        color: document.getElementById('selLanternColor')?.value,
+        pattern: document.getElementById('selLanternPattern')?.value,
+        frameStyle: frameStyle
+      };
+
+      const newItem = {
+        id: 'LK_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+        timestamp: new Date().toISOString(),
+        type: currentDiyType,
+        fullName: fullName,
+        department: department,
+        avatar: selectedAvatarIndex,
+        wish: wish,
+        imageUrl: uploadedPhotoBase64 || '', // Will be replaced by GAS drive URL if configured
+        designConfig: designConfig,
+        likes: 1
+      };
+
+      // Add to local database immediately so it renders without delay
+      itemsDatabase.unshift(newItem);
+      localStorage.setItem('loyKrathongItems', JSON.stringify(itemsDatabase.slice(0, 100)));
+
+      // Trigger Celebration Fireworks and Sound
+      playFireworksSound();
+      confetti({
+        particleCount: 90,
+        spread: 90,
+        origin: { y: 0.6 }
+      });
+
+      // Close modal and IMMEDIATELY render item on the river/sky with highlight
+      closeDIYModal();
+      renderFloatingItems(newItem.id);
+      renderStageDancers();
+
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane mr-1"></i> ${currentDiyType === 'krathong' ? 'ปล่อยกระทงลงสายน้ำ' : 'ปล่อยโคมลอยขึ้นสู่ท้องฟ้า'}`;
+
+      showToast(`ปล่อย${currentDiyType === 'krathong' ? 'กระทง' : 'โคมลอย'}สำเร็จแล้ว! ลอยอยู่ในสายน้ำแล้วครับ`, "success");
+
+      // Push to Google Apps Script asynchronously in background
+      if (appConfig.gasUrl && appConfig.gasUrl.startsWith('https://script.google.com')) {
+        const payload = {
+          action: 'uploadAndSave',
+          id: newItem.id,
+          type: newItem.type,
+          fullName: newItem.fullName,
+          department: newItem.department,
+          avatar: newItem.avatar,
+          wish: newItem.wish,
+          designConfig: JSON.stringify(designConfig),
+          base64Image: uploadedPhotoBase64 || '',
+          fileName: `loy_${Date.now()}.jpg`
+        };
+
+        fetch(appConfig.gasUrl, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(result => {
+          if (result && result.imageUrl) {
+            newItem.imageUrl = result.imageUrl;
+            localStorage.setItem('loyKrathongItems', JSON.stringify(itemsDatabase.slice(0, 100)));
+          }
+        })
+        .catch(err => {
+          console.warn("GAS background sync note:", err);
+        });
+      }
+    }
+
+    /* ========================================================
+       8. DETAIL MODAL (SHOW ON CLICK FLOATING ITEM)
+       ======================================================== */
+    let currentDetailItem = null;
+
+    function openDetailModal(item) {
+      currentDetailItem = item;
+      const modal = document.getElementById('detailModal');
+      modal.classList.remove('hidden');
+
+      document.getElementById('detailFullName').textContent = item.fullName;
+      document.getElementById('detailDepartment').textContent = item.department;
+      document.getElementById('detailWish').textContent = `"${item.wish}"`;
+      document.getElementById('detailLikeCount').textContent = item.likes || 1;
+      
+      const badge = document.getElementById('detailTypeBadge');
+      if (item.isBot) {
+        badge.textContent = item.type === 'krathong' ? 'กระทง (เพื่อนร่วมวิทยาลัย)' : 'โคมลอย (เพื่อนร่วมวิทยาลัย)';
+      } else {
+        badge.textContent = item.type === 'krathong' ? 'กระทง' : 'โคมลอย';
+      }
+      badge.className = item.type === 'krathong' 
+        ? 'absolute -bottom-1 -right-1 bg-amber-500 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded-full shadow'
+        : 'absolute -bottom-1 -right-1 bg-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow';
+
+      const photoContainer = document.getElementById('detailPhotoContainer');
+      if (item.imageUrl) {
+        photoContainer.innerHTML = `<img src="${item.imageUrl}" class="w-full h-full object-cover">`;
+      } else {
+        photoContainer.innerHTML = AVATARS_SVG[item.avatar || 0] || '🪷';
+      }
+
+      const d = new Date(item.timestamp);
+      document.getElementById('detailTime').textContent = isNaN(d) ? 'วันนี้' : d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    function likeDetailItem() {
+      if (!currentDetailItem) return;
+      currentDetailItem.likes = (currentDetailItem.likes || 0) + 1;
+      document.getElementById('detailLikeCount').textContent = currentDetailItem.likes;
+      
+      // Heart burst
+      confetti({
+        particleCount: 25,
+        spread: 50,
+        origin: { y: 0.5 },
+        colors: ['#EC4899', '#F43F5E', '#F59E0B']
+      });
+
+      localStorage.setItem('loyKrathongItems', JSON.stringify(itemsDatabase));
+      showToast("ส่งกำลังใจและความปรารถนาดีเรียบร้อยแล้ว ❤️", "success");
+    }
+
+    /* ========================================================
+       9. PARTICIPANTS DIRECTORY TABLE & CSV EXPORT
+       ======================================================== */
+    function openDirectoryModal() {
+      document.getElementById('directoryModal').classList.remove('hidden');
+      renderDirectoryTable();
+    }
+
+    function closeDirectoryModal() {
+      document.getElementById('directoryModal').classList.add('hidden');
+    }
+
+    function renderDirectoryTable() {
+      const tbody = document.getElementById('directoryTableBody');
+      const search = document.getElementById('dirSearchInput').value.toLowerCase();
+      const deptFilter = document.getElementById('dirDeptFilter').value;
+      const typeFilter = document.getElementById('dirTypeFilter').value;
+
+      let filtered = itemsDatabase.filter(item => {
+        const matchSearch = item.fullName.toLowerCase().includes(search) || (item.wish && item.wish.toLowerCase().includes(search));
+        const matchDept = deptFilter === 'all' || item.department === deptFilter;
+        const matchType = typeFilter === 'all' || item.type === typeFilter;
+        return matchSearch && matchDept && matchType;
+      });
+
+      document.getElementById('dirFilteredCount').textContent = filtered.length;
+      document.getElementById('dirTotalCount').textContent = itemsDatabase.length;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500">ไม่พบรายชื่อที่ค้นหา</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => {
+        const photoOrAvatar = item.imageUrl 
+          ? `<img src="${item.imageUrl}" class="w-8 h-8 rounded-full object-cover border border-amber-400">`
+          : `<div class="w-8 h-8 rounded-full bg-slate-800 p-1 border border-slate-700">${AVATARS_SVG[item.avatar || 0]}</div>`;
+        
+        const typeBadge = item.type === 'krathong'
+          ? `<span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px]">กระทง</span>`
+          : `<span class="bg-pink-500/20 text-pink-300 border border-pink-500/30 px-2 py-0.5 rounded-full text-[10px]">โคมลอย</span>`;
+
+        const d = new Date(item.timestamp);
+        const timeStr = isNaN(d) ? '-' : d.toLocaleDateString('th-TH', { hour: '2-digit', minute: '2-digit' });
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            <td class="py-2 px-3">${photoOrAvatar}</td>
+            <td class="py-2 px-3">${typeBadge}</td>
+            <td class="py-2 px-3 font-semibold text-white">${escapeHtml(item.fullName)}</td>
+            <td class="py-2 px-3 text-slate-400">${escapeHtml(item.department)}</td>
+            <td class="py-2 px-3 text-slate-300 max-w-xs truncate">${escapeHtml(item.wish || '-')}</td>
+            <td class="py-2 px-3 text-right text-slate-500 text-[11px]">${timeStr}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterDirectoryTable() {
+      renderDirectoryTable();
+    }
+
+    function exportParticipantsCSV() {
+      if (itemsDatabase.length === 0) {
+        showToast("ยังไม่มีข้อมูลสำหรับ Export CSV", "info");
+        return;
+      }
+
+      let csv = "\uFEFF"; // UTF-8 BOM for Thai language Excel support
+      csv += "ลำดับ,เวลา,ประเภท,ชื่อ-นามสกุล,แผนกวิชา,คำอธิษฐาน,จำนวนไลก์\n";
+
+      itemsDatabase.forEach((item, idx) => {
+        const time = new Date(item.timestamp).toLocaleString('th-TH');
+        const type = item.type === 'krathong' ? 'กระทง' : 'โคมลอย';
+        const cleanWish = (item.wish || '').replace(/"/g, '""');
+        csv += `${idx + 1},"${time}","${type}","${item.fullName}","${item.department}","${cleanWish}",${item.likes || 1}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `loy_krathong_participants_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      showToast("ดาวน์โหลดไฟล์ CSV เรียบร้อยแล้ว", "success");
+    }
+
+    /* ========================================================
+       10. DIGITAL ESIIMSI & STORY CANVAS MAKER (PAGE 2)
+       ======================================================== */
+    let isShakingEsiimsi = false;
+    let currentFortune = null;
+
+    function shakeEsiimsi() {
+      if (isShakingEsiimsi) return;
+      isShakingEsiimsi = true;
+
+      const cylinder = document.getElementById('bambooCylinder');
+      const fallingStick = document.getElementById('fallingStick');
+      const resultCard = document.getElementById('fortuneResultCard');
+      
+      resultCard.classList.add('hidden');
+      fallingStick.classList.add('opacity-0', '-translate-y-8');
+      cylinder.classList.add('animate-shake-bamboo');
+
+      // Play bamboo rattle sound
+      playBambooShakeSound();
+
+      setTimeout(() => {
+        cylinder.classList.remove('animate-shake-bamboo');
+        
+        // Randomly pick fortune
+        currentFortune = ESIIMSI_FORTUNES[Math.floor(Math.random() * ESIIMSI_FORTUNES.length)];
+        
+        // Pop out the bamboo stick
+        document.getElementById('esiimsiStickNumber').textContent = currentFortune.num;
+        fallingStick.classList.remove('opacity-0', '-translate-y-8');
+        playStickDropSound();
+
+        setTimeout(() => {
+          // Display the fortune slip
+          document.getElementById('fortuneTitle').textContent = currentFortune.title;
+          document.getElementById('fortunePoem').textContent = `"${currentFortune.poem}"`;
+          document.getElementById('fortuneStudy').textContent = currentFortune.study;
+          document.getElementById('fortuneLove').textContent = currentFortune.love;
+          document.getElementById('fortuneLuck').textContent = currentFortune.luck;
+
+          resultCard.classList.remove('hidden');
+          isShakingEsiimsi = false;
+
+          // Confetti celebration
+          confetti({
+            particleCount: 40,
+            spread: 60,
+            origin: { y: 0.7 }
+          });
+        }, 600);
+      }, 1200);
+    }
+
+    function resetEsiimsi() {
+      document.getElementById('fortuneResultCard').classList.add('hidden');
+      document.getElementById('fallingStick').classList.add('opacity-0', '-translate-y-8');
+    }
+
+    // HTML5 Canvas generator for IG/FB Story (1080 x 1920)
+    function downloadFortuneCard() {
+      if (!currentFortune) return;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080;
+      canvas.height = 1920;
+      const ctx = canvas.getContext('2d');
+
+      // Gradient Background
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, 1920);
+      bgGrad.addColorStop(0, '#0B132B');
+      bgGrad.addColorStop(0.3, '#1C2541');
+      bgGrad.addColorStop(1, '#070D1F');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, 1080, 1920);
+
+      // Decorative Border
+      ctx.strokeStyle = '#F59E0B';
+      ctx.lineWidth = 14;
+      ctx.strokeRect(40, 40, 1000, 1840);
+      ctx.strokeStyle = '#D97706';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(60, 60, 960, 1800);
+
+      // Header College Text
+      ctx.fillStyle = '#FDE68A';
+      ctx.font = 'bold 44px Kanit';
+      ctx.textAlign = 'center';
+      ctx.fillText(appConfig.collegeName, 540, 150);
+
+      ctx.fillStyle = '#CBD5E1';
+      ctx.font = '32px Kanit';
+      ctx.fillText(`ประเพณีลอยกระทง ประจำปี ${appConfig.year}`, 540, 210);
+
+      // Card container for fortune slip
+      ctx.fillStyle = '#FFFDF5';
+      ctx.beginPath();
+      ctx.roundRect(100, 300, 880, 1380, 40);
+      ctx.fill();
+      ctx.strokeStyle = '#E2B16F';
+      ctx.lineWidth = 8;
+      ctx.stroke();
+
+      // Stamp Badge
+      ctx.fillStyle = '#DC2626';
+      ctx.beginPath();
+      ctx.roundRect(390, 270, 300, 60, 30);
+      ctx.fill();
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 30px Kanit';
+      ctx.fillText('เซียมซีนำโชค', 540, 312);
+
+      // Slip Title & Number
+      ctx.fillStyle = '#991B1B';
+      ctx.font = 'bold 58px Kanit';
+      ctx.fillText(currentFortune.title, 540, 420);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '28px Kanit';
+      const userName = document.getElementById('inputFullName').value.trim() || 'ผู้เสี่ยงทาย';
+      ctx.fillText(`ผู้เสี่ยงทาย: ${userName}`, 540, 480);
+
+      // Divider line
+      ctx.strokeStyle = '#FCD34D';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(180, 520);
+      ctx.lineTo(900, 520);
+      ctx.stroke();
+
+      // Poem
+      ctx.fillStyle = '#78350F';
+      ctx.font = 'italic bold 38px Kanit';
+      wrapText(ctx, `"${currentFortune.poem}"`, 540, 620, 760, 55);
+
+      // Detail Boxes
+      drawDetailBox(ctx, 160, 780, 760, 180, 'การเรียน & การสอบ', currentFortune.study, '#1D4ED8', '#EFF6FF');
+      drawDetailBox(ctx, 160, 1000, 760, 180, 'ความรัก & ความสัมพันธ์', currentFortune.love, '#BE185D', '#FDF2F8');
+      drawDetailBox(ctx, 160, 1220, 760, 180, 'โชคลาภ & โอกาสดี', currentFortune.luck, '#047857', '#ECFDF5');
+
+      // Footer Hashtag / Credit
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '30px Kanit';
+      ctx.fillText('#ลอยกระทงออนไลน์ #วิทยาลัยเทคนิคท่าหลวงฯ', 540, 1530);
+
+      // Convert to image and trigger download
+      const imgURL = canvas.toDataURL('image/jpeg', 0.9);
+      const link = document.createElement('a');
+      link.download = `esiimsi_story_${currentFortune.num}.jpg`;
+      link.href = imgURL;
+      link.click();
+
+      showToast("บันทึกรูปภาพใบเซียมซีสำหรับแชร์ลงสตอรี่แล้ว!", "success");
+    }
+
+    function drawDetailBox(ctx, x, y, w, h, title, text, titleColor, bgColor) {
+      ctx.fillStyle = bgColor;
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, 20);
+      ctx.fill();
+      ctx.strokeStyle = titleColor;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = titleColor;
+      ctx.font = 'bold 36px Kanit';
+      ctx.textAlign = 'left';
+      ctx.fillText(`• ${title}`, x + 30, y + 55);
+
+      ctx.fillStyle = '#1E293B';
+      ctx.font = '30px Kanit';
+      wrapText(ctx, text, x + 30, y + 115, w - 60, 42, 'left');
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight, align = 'center') {
+      ctx.textAlign = align;
+      const words = text.split(' ');
+      let line = '';
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          ctx.fillText(line, x, y);
+          line = words[n] + ' ';
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, y);
+    }
+
+    // Motion Shake Detector for mobile devices
+    if (window.DeviceMotionEvent) {
+      let lastX, lastY, lastZ;
+      let lastTime = 0;
+      window.addEventListener('devicemotion', (e) => {
+        if (currentPageIndex !== 1) return; // Only trigger on Esiimsi page
+        const current = e.accelerationIncludingGravity;
+        if (!current) return;
+        const now = Date.now();
+        if ((now - lastTime) > 100) {
+          const diffTime = now - lastTime;
+          lastTime = now;
+          const speed = Math.abs(current.x + current.y + current.z - lastX - lastY - lastZ) / diffTime * 10000;
+          if (speed > 1100 && !isShakingEsiimsi) {
+            shakeEsiimsi();
+          }
+          lastX = current.x;
+          lastY = current.y;
+          lastZ = current.z;
+        }
+      });
+    }
+
+    /* ========================================================
+       11. RETRO RAMWONG STAGE & DANCERS (PAGE 3)
+       ======================================================== */
+    function renderStageDancers() {
+      const container = document.getElementById('dancersStageContainer');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      // Get 4-6 dancers: either from recent participants or default vocational characters
+      let dancers = itemsDatabase.slice(0, 5);
+      if (dancers.length < 4) {
+        const defaultDancers = [
+          { fullName: "น้องฝ้าย", department: "เทคโนโลยีคอมพิวเตอร์", avatar: 1 },
+          { fullName: "ช่างเบิร์ด", department: "ช่างยนต์", avatar: 2 },
+          { fullName: "น้องเมย์", department: "การบัญชี", avatar: 3 },
+          { fullName: "พี่ก้อง", department: "ช่างไฟฟ้ากำลัง", avatar: 0 }
+        ];
+        dancers = [...dancers, ...defaultDancers].slice(0, 5);
+      }
+
+      dancers.forEach((dancer, idx) => {
+        const dancerElem = document.createElement('div');
+        dancerElem.className = 'flex flex-col items-center transform transition-transform animate-sway';
+        dancerElem.style.animationDelay = `${idx * 0.4}s`;
+
+        const photoOrAvatar = dancer.imageUrl
+          ? `<img src="${dancer.imageUrl}" class="w-12 h-12 rounded-full object-cover border-2 border-amber-400">`
+          : `<div class="w-12 h-12 rounded-full bg-slate-800 p-1 border-2 border-amber-400">${AVATARS_SVG[dancer.avatar || idx % AVATARS_SVG.length]}</div>`;
+
+        dancerElem.innerHTML = `
+          <!-- Dancing Avatar Head -->
+          <div class="relative">
+            <div class="shadow-lg">
+              ${photoOrAvatar}
+            </div>
+            <!-- Traditional Flower Hair Garland -->
+            <span class="absolute -top-1 -right-1 text-sm">🌺</span>
+          </div>
+
+          <!-- Thai Costume Torso & Waving Hands -->
+          <div class="w-14 h-12 -mt-1 flex items-center justify-center relative">
+            <!-- Left hand waving -->
+            <span class="text-sm transform -rotate-45 -mr-1">🪷</span>
+            <!-- Body -->
+            <div class="w-9 h-11 bg-gradient-to-b from-amber-500 to-pink-600 rounded-t-lg border border-yellow-300 shadow"></div>
+            <!-- Right hand waving -->
+            <span class="text-sm transform rotate-45 -ml-1">🪷</span>
+          </div>
+
+          <!-- Name & Department Tag -->
+          <div class="bg-slate-950/90 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-pink-500/40 mt-1 whitespace-nowrap max-w-[85px] truncate shadow">
+            ${escapeHtml(dancer.fullName)}
+          </div>
+          <div class="text-[8px] text-pink-300/80 truncate max-w-[80px]">
+            ${escapeHtml(dancer.department)}
+          </div>
+        `;
+
+        container.appendChild(dancerElem);
+      });
+    }
+
+    function cheerAction(type) {
+      const stageOverlay = document.getElementById('stageParticleOverlay');
+
+      if (type === 'flower') {
+        cheerGarlandCount += 1;
+        document.getElementById('countGarlands').textContent = `${cheerGarlandCount} พวง`;
+        localStorage.setItem('cheerGarlands', cheerGarlandCount);
+        createFlyingPetalParticles('🌺');
+        showToast("คล้องพวงมาลัยให้นักเต้นรำวงแล้ว! 🌺", "success");
+      } else {
+        cheerClapCount += 1;
+        document.getElementById('countClaps').textContent = `${cheerClapCount} ครั้ง`;
+        localStorage.setItem('cheerClaps', cheerClapCount);
+        createFlyingPetalParticles('👏');
+        playSynthNote(880, 0.15, 'triangle');
+        showToast("ส่งเสียงปรบมือ กรี๊ดดดดด! 👏", "info");
+      }
+    }
+
+    function createFlyingPetalParticles(emoji) {
+      const stage = document.getElementById('stageParticleOverlay');
+      for (let i = 0; i < 8; i++) {
+        const p = document.createElement('div');
+        p.className = 'absolute text-xl pointer-events-none transition-all duration-1000';
+        p.textContent = emoji;
+        p.style.left = `${20 + Math.random() * 60}%`;
+        p.style.bottom = '10px';
+        p.style.transform = 'translateY(0) scale(0.8)';
+        p.style.opacity = '1';
+        stage.appendChild(p);
+
+        setTimeout(() => {
+          p.style.transform = `translate(${(Math.random() - 0.5) * 120}px, -${120 + Math.random() * 100}px) scale(1.4)`;
+          p.style.opacity = '0';
+        }, 30);
+
+        setTimeout(() => {
+          p.remove();
+        }, 1100);
+      }
+    }
+
+    /* ========================================================
+       12. ADMIN SETTINGS & DONATION MODAL
+       ======================================================== */
+    function openAdminSettingsModal() {
+      document.getElementById('adminModal').classList.remove('hidden');
+      document.getElementById('adminAuthSection').classList.remove('hidden');
+      document.getElementById('adminFormSection').classList.add('hidden');
+      document.getElementById('adminPasswordInput').value = '';
+    }
+
+    function closeAdminSettingsModal() {
+      document.getElementById('adminModal').classList.add('hidden');
+    }
+
+    function verifyAdminPassword() {
+      const input = document.getElementById('adminPasswordInput').value;
+      if (input === appConfig.adminPassword) {
+        document.getElementById('adminAuthSection').classList.add('hidden');
+        document.getElementById('adminFormSection').classList.remove('hidden');
+
+        // Populate fields
+        document.getElementById('cfgCollegeName').value = appConfig.collegeName;
+        document.getElementById('cfgYear').value = appConfig.year;
+        document.getElementById('cfgGasUrl').value = appConfig.gasUrl || '';
+        document.getElementById('cfgDepartments').value = appConfig.departments.join(', ');
+      } else {
+        showToast("รหัสผ่านไม่ถูกต้อง (ค่าเริ่มต้น: 1234)", "error");
+      }
+    }
+
+    function saveAdminSettings() {
+      const cName = document.getElementById('cfgCollegeName').value.trim();
+      const yr = document.getElementById('cfgYear').value.trim();
+      const newPw = document.getElementById('cfgNewPassword').value.trim();
+      const gas = document.getElementById('cfgGasUrl').value.trim();
+      const depts = document.getElementById('cfgDepartments').value.split(',').map(s => s.trim()).filter(Boolean);
+
+      if (cName) appConfig.collegeName = cName;
+      if (yr) appConfig.year = yr;
+      if (newPw) appConfig.adminPassword = newPw;
+      appConfig.gasUrl = gas;
+      if (depts.length) appConfig.departments = depts;
+
+      localStorage.setItem('loyKrathongConfig', JSON.stringify(appConfig));
+      applyConfigToUI();
+      closeAdminSettingsModal();
+      showToast("บันทึกการตั้งค่าเรียบร้อยแล้ว", "success");
+    }
+
+    function applyConfigToUI() {
+      document.getElementById('headerTitle').textContent = `ลอยกระทงออนไลน์ ${appConfig.year}`;
+      document.getElementById('headerSubtitle').textContent = appConfig.collegeName;
+
+      // Populate department dropdowns
+      const sel = document.getElementById('selectDepartment');
+      const dirSel = document.getElementById('dirDeptFilter');
+      
+      sel.innerHTML = appConfig.departments.map(d => `<option value="${d}">${d}</option>`).join('');
+      dirSel.innerHTML = `<option value="all">ทุกแผนกวิชา</option>` + appConfig.departments.map(d => `<option value="${d}">${d}</option>`).join('');
+    }
+
+    function openDonateModal() {
+      document.getElementById('donateModal').classList.remove('hidden');
+    }
+
+    function closeDonateModal() {
+      document.getElementById('donateModal').classList.add('hidden');
+    }
+
+    function copyToClipboard(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast("คัดลอกเลขบัญชี 4130745003 เรียบร้อยแล้ว", "success");
+        });
+      } else {
+        const temp = document.createElement('textarea');
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        showToast("คัดลอกเลขบัญชี 4130745003 เรียบร้อยแล้ว", "success");
+      }
+    }
+
+    /* ========================================================
+       13. TOAST NOTIFICATION & UTILITIES
+       ======================================================== */
+    let toastTimeout = null;
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toastNotification');
+      const msg = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+
+      msg.textContent = message;
+      if (type === 'success') {
+        icon.className = 'fa-solid fa-circle-check text-emerald-400';
+      } else if (type === 'error') {
+        icon.className = 'fa-solid fa-circle-exclamation text-rose-500';
+      } else {
+        icon.className = 'fa-solid fa-circle-info text-amber-400';
+      }
+
+      toast.classList.remove('opacity-0', '-translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-4');
+      }, 3000);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    /* ========================================================
+       14. INITIALIZATION ON WINDOW LOAD
+       ======================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      applyConfigToUI();
+      initCanvasDimensions();
+      animateRiverCanvas();
+
+      // Seed initial dummy items if list is empty for immediate rich experience
+      if (itemsDatabase.length === 0) {
+        itemsDatabase = [
+          {
+            id: 'LK_INIT_1',
+            timestamp: new Date().toISOString(),
+            type: 'krathong',
+            fullName: 'สมชาย สายลุย',
+            department: 'ช่างเทคโนโลยีคอมพิวเตอร์',
+            avatar: 0,
+            wish: 'ขอขมาพระแม่คงคา และขอให้โปรเจกต์ผ่านฉลุย เกรดสี่ทุกวิชาครับ',
+            likes: 12,
+            designConfig: { base: 'banana', flowers: 'marigold', candle: 'gold', frameStyle: 'circle' }
+          },
+          {
+            id: 'LK_INIT_2',
+            timestamp: new Date().toISOString(),
+            type: 'lantern',
+            fullName: 'กานดา สดใส',
+            department: 'การบัญชี',
+            avatar: 1,
+            wish: 'ขอให้ครอบครัวมีสุขภาพแข็งแรง ร่ำรวยเงินทอง มีแต่ความสุข',
+            likes: 19,
+            designConfig: { shape: 'traditional', color: '#FBBF24', frameStyle: 'heart' }
+          },
+          {
+            id: 'LK_INIT_3',
+            timestamp: new Date().toISOString(),
+            type: 'krathong',
+            fullName: 'ช่างบอย ซอยแปด',
+            department: 'ช่างยนต์',
+            avatar: 2,
+            wish: 'ขอให้ปีนี้สอบผ่านช็อปปฏิบัติการ แข่งขันชนะเลิศอันดับหนึ่ง!',
+            likes: 8,
+            designConfig: { base: 'lotus', flowers: 'orchid', candle: 'red', frameStyle: 'circle' }
+          }
+        ];
+        localStorage.setItem('loyKrathongItems', JSON.stringify(itemsDatabase));
+      }
+
+      renderFloatingItems();
+      renderStageDancers();
+      document.getElementById('countGarlands').textContent = `${cheerGarlandCount} พวง`;
+      document.getElementById('countClaps').textContent = `${cheerClapCount} ครั้ง`;
+
+      // Fetch latest from Google Apps Script if URL provided
+      if (appConfig.gasUrl && appConfig.gasUrl.startsWith('https://script.google.com')) {
+        fetch(`${appConfig.gasUrl}?action=getList`)
+          .then(res => res.json())
+          .then(data => {
+            if (Array.isArray(data) && data.length > 0) {
+              itemsDatabase = data;
+              localStorage.setItem('loyKrathongItems', JSON.stringify(itemsDatabase));
+              renderFloatingItems();
+              renderStageDancers();
+            }
+          })
+          .catch(e => console.warn("GAS fetch error:", e));
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      initCanvasDimensions();
+    });
+  </script>
+</body>
+</html>
